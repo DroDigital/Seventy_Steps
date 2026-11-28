@@ -94,7 +94,7 @@ export function insightSystem(g: Game): void {
   }
 }
 
-export const upgradeName = (id: UpgradeId): string => id[0].toUpperCase() + id.slice(1);
+export const upgradeName = (id: UpgradeId): string => tr(`up.${id}`); // in the language chosen (1.5.0)
 
 /**
  * The insight that is kept (round 61): what the hidden passages want, so every one stays open, and the cost of each upgrade not yet

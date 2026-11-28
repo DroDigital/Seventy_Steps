@@ -2,6 +2,7 @@
 
 import type { Key } from './en';
 import { DE_PAGES } from './pages/de';
+import { DE_SCREENS } from './screens/de';
 
 export const DE: Readonly<Record<Key, string>> = {
   'keys.back': "Zurück",
@@ -393,7 +394,7 @@ export const DE: Readonly<Record<Key, string>> = {
   'hint.riposte': "Ihr habt pariert: der Gegner ist offen. Schlagt sofort zu für einen kleinen Ripostenbonus. Auch ein schwerer Schlag genau in den Rücken eines Gegners erhält diesen Bonus.",
   'hint.fog': "Der Nebel voraus birgt einen Schrecken. {interact} geht hindurch, und wer einmal drin ist, kann nicht fort, bis einer von euch fällt. Ruht und werdet erst stärker, und entzündet die Kerze in seiner Nähe, wenn ihr wollt.",
   'hint.talk': "{interact} spricht mit den Menschen, denen ihr begegnet. Manche haben einen Auftrag, manche Waren, und alle wissen etwas.",
-  'hint.insight': "Einsicht ist, was der Geist gelernt hat. Sie öffnet Verborgenes, und sie wird ausgegeben: an einem Ältesten Zeichen kauft sie Resolve und Draught.",
+  'hint.insight': "Einsicht ist, was der Geist gelernt hat. Sie öffnet Verborgenes, und sie wird ausgegeben: an einem Ältesten Zeichen kauft sie Entschlossenheit und Schlucke.",
   'hint.passage': "Für einen Geist wie den euren war diese Wand keine Wand. Einsicht zeigt Türen und Brücken, die den Unwissenden verborgen bleiben; der leuchtende Rahmen ist eine. Geht hindurch: dahinter liegt etwas.",
   'hint.passageCost': "Verbrauchte Einsicht ist fort, und ein Durchgang, den sie offen hielt, wird wieder zur Wand. An einem Ältesten Zeichen nennt das Menü, was ein Kauf wieder verschlösse, bevor ihr zahlt.",
   'hint.lore': "Einsicht über das hinaus, was die verborgenen Durchgänge verlangen und die Aufwertungen des Geistes kosten, hat sonst keinen Nutzen. An einem Ältesten Zeichen, unter Level up, lässt sie sich gegen Echos anbieten.",
@@ -445,4 +446,5 @@ export const DE: Readonly<Record<Key, string>> = {
   'tip.heal.inject': "Wests Reagenz spritzen · schließt Wunden",
   'tip.mount.call': "Den Wagen rufen",
   ...DE_PAGES, // (1.5.0)
+  ...DE_SCREENS, // the Elder Sign's screens (1.5.0)
 };

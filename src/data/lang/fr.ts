@@ -2,6 +2,7 @@
 
 import type { Key } from './en';
 import { FR_PAGES } from './pages/fr';
+import { FR_SCREENS } from './screens/fr';
 
 export const FR: Readonly<Record<Key, string>> = {
   'keys.back': "Retour",
@@ -393,7 +394,7 @@ export const FR: Readonly<Record<Key, string>> = {
   'hint.riposte': "Vous avez paré : l’ennemi est ouvert. Frappez aussitôt pour un léger bonus de riposte. Un coup lourd porté bien au centre du dos d’un ennemi donne aussi ce bonus.",
   'hint.fog': "La brume devant vous cache une horreur. {interact} la traverse, et une fois dedans, on ne sort plus avant que l’un de vous tombe. Reposez-vous et devenez plus fort d’abord, et allumez la bougie près d’elle, si vous le voulez.",
   'hint.talk': "{interact} parle aux gens que vous croisez. Certains ont une quête à confier, d’autres des marchandises à vendre, et tous savent quelque chose.",
-  'hint.insight': "Le discernement est ce que l’esprit a appris. Il ouvre ce qui est caché, et il se dépense : à un Signe des Anciens, il achète Resolve et Draught.",
+  'hint.insight': "Le discernement est ce que l’esprit a appris. Il ouvre ce qui est caché, et il se dépense : à un Signe des Anciens, il achète Résolution et Gorgées.",
   'hint.passage': "Pour un esprit comme le vôtre, ce mur n’en était pas un. Le discernement montre des portes et des ponts que les ignorants ne voient pas ; le cadre lumineux en est un. Passez : quelque chose se trouve au-delà.",
   'hint.passageCost': "Le discernement dépensé est perdu, et un passage qu’il tenait ouvert redevient un mur. À un Signe des Anciens, le menu dit ce qu’un achat refermerait avant que vous payiez.",
   'hint.lore': "Le discernement au-delà de ce que demandent les passages cachés et de ce que coûtent les améliorations de l’esprit ne sert à rien d’autre. À un Signe des Anciens, sous Level up, on peut l’offrir contre des Échos.",
@@ -445,4 +446,5 @@ export const FR: Readonly<Record<Key, string>> = {
   'tip.heal.inject': "Injecter le Réactif de West · ferme les plaies",
   'tip.mount.call': "Appeler le char",
   ...FR_PAGES, // (1.5.0)
+  ...FR_SCREENS, // the Elder Sign's screens (1.5.0)
 };

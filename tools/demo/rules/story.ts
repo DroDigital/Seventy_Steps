@@ -12,7 +12,7 @@ const realms = new Set<string>(ALL_REALMS);
  * The horrors' status lines and notices (`sig.*`: each belongs to a signature the demo does not keep; the Colour's has none of them) and
  * the Dunwich's powder, which only the full game's Dunwich Horror shows (`boss.powder`): the demo's bundle never holds their names.
  */
-const horrorLinesLeftOut = (key: string): boolean => key.startsWith('sig.') || key === 'boss.powder';
+const horrorLinesLeftOut = (key: string): boolean => key.startsWith('sig.') || key === 'boss.powder' || key === 'sign.court'; // (the Court of Azathoth's heading, 1.5.0)
 
 /** A line of the field guide or a hint the demo leaves out (`hint.ship`), and a realm's epigraph the demo does not keep (`epigraph.pnakotus`). */
 const lineKept = (key: string): boolean => {
@@ -43,6 +43,11 @@ export const rules: readonly PruneRule[] = [
   language('src/data/lang/de.ts', 'DE'),
   language('src/data/lang/fr.ts', 'FR'),
   language('src/data/lang/es.ts', 'ES'),
+  // the screens' words, spread into each (1.5.0): the Court's heading names a horror the demo does not keep
+  language('src/data/lang/screens/en.ts', 'EN_SCREENS'),
+  language('src/data/lang/screens/de.ts', 'DE_SCREENS'),
+  language('src/data/lang/screens/fr.ts', 'FR_SCREENS'),
+  language('src/data/lang/screens/es.ts', 'ES_SCREENS'),
   // the story's translations, by the source's ids: the people (and the trader at the lamps), the rumours of a horror's fall, the mutterings, the epilogues
   ...storyTable('people', (id) => npcs(id) || id === 'trader'),
   ...storyTable('rumors', entities),

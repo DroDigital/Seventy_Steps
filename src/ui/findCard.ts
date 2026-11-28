@@ -55,8 +55,8 @@ export function createFindCard(g: Game, busy: () => boolean = () => false): Find
     const page: Page = {
       back: () => screen.close(),
       build(panel) {
-        title(panel, 'WEAPON FOUND');
-        head(panel, weaponGlyph(id, 40), story(w.name), from ? `From ${from}` : '');
+        title(panel, t('find.weapon'));
+        head(panel, weaponGlyph(id, 40), story(w.name), from ? t('find.from', { name: story(from) }) : '');
         sentence(panel, story(w.note), 'font-style:italic;opacity:.8;margin:6px 0 8px');
         const figures = weaponFigureList(g, id);
         chips(panel, figures, 'justify-content:center;margin:0 14px 4px');
@@ -64,10 +64,10 @@ export function createFindCard(g: Game, busy: () => boolean = () => false): Find
         if (temper) sentence(panel, temper, 'opacity:.7;font-size:13px');
         const hand = story(WEAPONS[g.player.weapon].name);
         const carried = g.player.arms.length;
-        sentence(panel, `${hand} is in hand.   You carry ${carried} of ${WEAPON_IDS.length} weapons.`, 'opacity:.5;font-size:12px;margin-top:10px');
-        button(panel, 'Take it up now', () => (equip(g, id), g.events.emit('Notice', { text: t("n.inHand", { name: story(w.name).toUpperCase() }) }), screen.close()), true, 'The weapon in hand is set aside. Your reinforcement stays with the weapon it was set into.');
-        button(panel, 'Keep it for later', () => screen.close(), true, fill('It is kept. Take it up any time from {pause} · Arms.'));
-        footer(panel, fill('Take it up any time from {pause} · Arms.'), () => screen.close());
+        sentence(panel, t('find.inHand', { hand, n: carried, of: WEAPON_IDS.length }), 'opacity:.5;font-size:12px;margin-top:10px');
+        button(panel, t('find.takeUp'), () => (equip(g, id), g.events.emit('Notice', { text: t("n.inHand", { name: story(w.name).toUpperCase() }) }), screen.close()), true, t('find.takeUpNote'));
+        button(panel, t('find.keep'), () => screen.close(), true, fill(t('find.keepNote')));
+        footer(panel, fill(t('find.foot')), () => screen.close());
       },
     };
     return page;
@@ -78,18 +78,18 @@ export function createFindCard(g: Game, busy: () => boolean = () => false): Find
     const page: Page = {
       back: () => screen.close(),
       build(panel) {
-        title(panel, 'RELIC FOUND');
-        head(panel, relicGlyph(id), story(r.name), from ? `Left by ${from}` : '');
+        title(panel, t('find.relic'));
+        head(panel, relicGlyph(id), story(r.name), from ? t('find.leftBy', { name: story(from) }) : '');
         sentence(panel, story(r.note), 'font-style:italic;opacity:.8;margin:6px 0 8px');
         if (relicEffects(id).length) effectChips(panel, id, 'justify-content:center;margin:0 14px 4px');
         const at = slotsOf(g).indexOf(id);
-        sentence(panel, at >= 0 ? `Worn in slot ${NUMERALS[at]} of ${RELIC_SLOTS}.` : `Both slots are full, so it is kept, not worn.`, `color:${ACCENT};margin-top:8px`);
-        sentence(panel, `Two relics are worn at a time, and every one worn has its price. You have found ${owned(g).length} of ${RELIC_IDS.length}. Change what you wear at any Elder Sign.`, 'opacity:.5;font-size:12px;margin-top:6px');
+        sentence(panel, at >= 0 ? t('find.wornIn', { n: NUMERALS[at]!, of: RELIC_SLOTS }) : t('find.full'), `color:${ACCENT};margin-top:8px`);
+        sentence(panel, t('find.relicNote', { n: owned(g).length, of: RELIC_IDS.length }), 'opacity:.5;font-size:12px;margin-top:6px');
         if (worn && at >= 0) {
-          button(panel, 'Keep it worn', () => screen.close(), true, 'Its gifts and its price are yours until you change them at an Elder Sign.');
-          button(panel, 'Take it off', () => (wear(g, at, null), screen.close()), true, 'It is kept, and does nothing. Wear it again at an Elder Sign.');
-        } else button(panel, 'Understood', () => screen.close(), true, 'Choose what to wear at any Elder Sign: its Relics tab.');
-        footer(panel, 'Relics are changed at an Elder Sign.', () => screen.close());
+          button(panel, t('find.keepWorn'), () => screen.close(), true, t('find.keepWornNote'));
+          button(panel, t('find.takeOff'), () => (wear(g, at, null), screen.close()), true, t('find.takeOffNote'));
+        } else button(panel, t('find.understood'), () => screen.close(), true, t('find.understoodNote'));
+        footer(panel, t('find.relicFoot'), () => screen.close());
       },
     };
     return page;

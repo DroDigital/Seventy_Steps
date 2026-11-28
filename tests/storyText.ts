@@ -27,7 +27,7 @@ import { FATES } from '../src/data/epilogues';
 import { OVERHEARD } from '../src/data/overheard';
 import { POIS } from '../src/data/pois';
 import { QUESTS } from '../src/data/quests';
-import { RELICS } from '../src/data/relics';
+import { RELICS, TEMPERS } from '../src/data/relics';
 import { REGIONS } from '../src/data/regions';
 import { ENTITIES } from '../src/data/registry';
 import { RUMORS } from '../src/data/rumors';
@@ -112,7 +112,7 @@ export const STORY_SOURCES: Readonly<Record<StoryDomain, () => StorySource>> = {
   // the arms: each weapon's name, how it handles and where it is had, and each relic's name and its gift and price
   arms: () =>
     new Map<string, string[]>([
-      ...Object.entries(WEAPONS).map(([id, w]) => [id, lines(w.name, w.note, (WEAPON_WHERE as Record<string, string>)[id])] as [string, string[]]),
+      ...Object.entries(WEAPONS).map(([id, w]) => [id, lines(w.name, w.note, (WEAPON_WHERE as Record<string, string>)[id], (TEMPERS as Record<string, { line: string } | undefined>)[id]?.line)] as [string, string[]]),
       ...Object.entries(RELICS).map(([id, r]) => [id, lines(r.name, r.note)] as [string, string[]]),
     ]),
   // what the merchants sell: a name and what it is for ({buttons} kept as they are)

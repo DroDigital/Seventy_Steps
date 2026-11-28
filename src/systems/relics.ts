@@ -104,6 +104,6 @@ export interface Effect {
 export function relicEffects(id: RelicId): Effect[] {
   const r = RELICS[id] as Relic;
   const pct = (v: number): string => `${v >= 1 ? '+' : '−'}${Math.round(Math.abs(v - 1) * 100)}%`;
-  const rows: [number | undefined, string, boolean][] = [[r.dealt, 'Damage', true], [r.taken, 'Damage taken', false], [r.health, 'Max health', true], [r.stamina, 'Max stamina', true], [r.recovery, 'Stamina recovery', true], [r.echoes, 'Echoes', true], [r.mend, 'Mending', true]];
-  return rows.filter(([v]) => v !== undefined && v !== 1).map(([v, what, more]) => ({ text: `${what} ${pct(v!)}`, good: (v! > 1) === more }));
+  const rows: [number | undefined, 'dealt' | 'taken' | 'health' | 'stamina' | 'recovery' | 'echoes' | 'mend', boolean][] = [[r.dealt, 'dealt', true], [r.taken, 'taken', false], [r.health, 'health', true], [r.stamina, 'stamina', true], [r.recovery, 'recovery', true], [r.echoes, 'echoes', true], [r.mend, 'mend', true]];
+  return rows.filter(([v]) => v !== undefined && v !== 1).map(([v, what, more]) => ({ text: t(`fx.${what}`, { n: pct(v!) }), good: (v! > 1) === more }));
 }

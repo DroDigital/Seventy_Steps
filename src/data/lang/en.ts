@@ -6,6 +6,7 @@
  */
 
 import { EN_PAGES } from './pages/en';
+import { EN_SCREENS } from './screens/en';
 
 export const EN = {
   // keys at the foot of a page
@@ -465,6 +466,7 @@ export const EN = {
   'tip.heal.inject': "Inject West’s Reagent · closes wounds",
   'tip.mount.call': "Call the chariot",
   ...EN_PAGES, // the pages' words (1.5.0)
+  ...EN_SCREENS, // the Elder Sign's screens (1.5.0)
 } as const satisfies Record<string, string>;
 
 export type Key = keyof typeof EN;

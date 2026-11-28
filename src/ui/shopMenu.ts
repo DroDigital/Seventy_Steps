@@ -4,7 +4,7 @@
  * (menuKit.ts); the investigator takes no input while it is open, as at an Elder Sign.
  */
 
-import { story } from '../core/i18n';
+import { story, t } from '../core/i18n';
 import { SHOPS, WARES } from '../data/wares';
 import type { Game } from '../systems/components';
 import { buy, canBuy, carried, hasRoom, stockLeft } from '../systems/trade';
@@ -23,20 +23,20 @@ export function createShopMenu(g: Game): ShopMenu {
     const page: Page = {
       back: () => screen.close(),
       build(panel) {
-        title(panel, name.toUpperCase());
-        resources(panel, [{ label: 'ECHOES', value: g.player.echoes, hot: true }]);
+        title(panel, story(name).toUpperCase());
+        resources(panel, [{ label: t('sign.echoesLabel'), value: g.player.echoes, hot: true }]);
         for (const id of wares) {
           const w = WARES[id];
           const left = stockLeft(g, id);
           const ok = canBuy(g, id);
           const room = hasRoom(g, id);
-          const why = left === 0 ? 'Sold out.' : !room ? 'No room to carry it.' : 'Not enough Echoes.';
+          const why = left === 0 ? t('shop.soldOut') : !room ? t('shop.noRoom') : t('shop.noEchoes');
           const c = carried(g, id); // what a pocket holds, before it is asked (round 24)
-          const b = option(panel, left === undefined || left === 0 ? story(w.name) : `${story(w.name)}  ·  ${left} left`, () => (buy(g, id), page.redraw?.()), ok, why, fill(story(w.note))); // round 38: still a line to choose, so that what it is can be read, and why it cannot be bought
-          if (c) chips(b, [{ text: `Carried ${c.have} of ${c.most} ${c.unit}`, tone: 'dim' }]);
-          if (left === 0) price(b, 'SOLD OUT', 'max');
-          else if (!room) price(b, 'NO ROOM', 'no'); // (a full pocket said nothing, round 24)
-          else price(b, `${w.price} Echoes`, ok ? 'ok' : 'no');
+          const b = option(panel, left === undefined || left === 0 ? story(w.name) : `${story(w.name)}  ·  ${t('shop.left', { n: left })}`, () => (buy(g, id), page.redraw?.()), ok, why, fill(story(w.note))); // round 38: still a line to choose, so that what it is can be read, and why it cannot be bought
+          if (c) chips(b, [{ text: t(`shop.carried.${id as 'oil' | 'rounds' | 'vial'}`, { have: c.have, most: c.most }), tone: 'dim' }]);
+          if (left === 0) price(b, t('shop.soldOutChip'), 'max');
+          else if (!room) price(b, t('shop.noRoomChip'), 'no'); // (a full pocket said nothing, round 24)
+          else price(b, t('sign.echoes', { n: w.price }), ok ? 'ok' : 'no');
         }
         footer(panel, '', () => screen.close());
       },

@@ -1,4 +1,4 @@
-/** The arms: each weapon's name, how it handles and where it is had, and each relic's gift and price in French. */
+/** The arms: each weapon's name, how it handles, where it is had and its temper, and each relic's gift and price in French. */
 
 import type { StoryTable } from '..';
 
@@ -21,11 +21,21 @@ export const FR_ARMS: StoryTable = {
     "Obed Marsh's Cutlass": "Le Coutelas d'Obed Marsh",
     "Off the Sumatra Queen, rusted at the basket. Wide cuts that find more than one foe.": "Du Sumatra Queen, rouillé à la garde. De larges entailles qui trouvent plus d'un ennemi.",
     "It lies in the cells off the Drowned Hall of Y'ha-nthlei, beneath Innsmouth.": "Il se trouve dans les cellules attenantes à la Salle noyée de Y'ha-nthlei, sous Innsmouth.",
+    ...(__DEMO__
+      ? {}
+      : {
+          "Salt-rusted; it takes its share of every kill.": "Rongé de sel ; il prend sa part de chaque mort.",
+        }),
   },
   rapier: {
     "Zamacona's Espada": "L'Espada de Zamacona",
     "A Spanish sword of 1541, from the depths of K'n-yan. It reaches past a foe's guard; mind its narrow line.": "Une épée espagnole de 1541, venue des profondeurs de K'n-yan. Elle passe la garde d'un ennemi ; attention à sa ligne étroite.",
     "Zamacona gives it, in K'n-yan, once Tsathoggua is stilled.": "Zamacona vous la donne, à K'n-yan, une fois Tsathoggua apaisé.",
+    ...(__DEMO__
+      ? {}
+      : {
+          "A clean kill steadies the hand and the mind.": "Une mise à mort nette affermit la main et l'esprit.",
+        }),
   },
   starHook: {
     "Hook of the Star-Stone": "Crochet de la pierre-étoile",

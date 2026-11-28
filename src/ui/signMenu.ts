@@ -12,7 +12,7 @@
 import { getRegion } from '../data/regions';
 import { DESCENT_LINE } from '../data/loreLines';
 import { PLAYER_MOVES } from '../data/moves';
-import { DEFAULT_DIFFICULTY, DIFFICULTIES, GUN, LEVELS, REINFORCE, UPGRADES, type UpgradeId } from '../data/tuning';
+import { DEFAULT_DIFFICULTY, GUN, LEVELS, REINFORCE, UPGRADES, type UpgradeId } from '../data/tuning';
 import { WEAPONS } from '../data/weapons';
 import { canReinforce, edgeAt, reinforce, reinforceCost } from '../systems/arms';
 import { descentOpen, dream, signBeyondDemo, signPlace, travel } from '../systems/checkpoints';
@@ -37,10 +37,10 @@ import { story, t } from '../core/i18n';
 import { MOUNT_TRAVERSAL } from '../data/mounts';
 
 /** What one more level of each of the mind's gives, in words (the body's are in levelGains.ts). */
-const GAINS: Record<UpgradeId, string> = {
-  resolve: `sanity losses −${Math.round(UPGRADES.resolve.resist! * 100)}%`,
-  draught: `+${UPGRADES.draught.doses} Laudanum`,
-};
+const GAINS = (): Record<UpgradeId, string> => ({
+  resolve: t('gain.resolve', { n: Math.round(UPGRADES.resolve.resist! * 100) }),
+  draught: t('gain.draught', { n: UPGRADES.draught.doses ?? 0 }),
+});
 
 export interface SignMenu {
   readonly open: boolean;
@@ -51,7 +51,7 @@ export function createSignMenu(g: Game, go: (words: string, jump: () => void, li
   const screen = createScreen(3, '#050506cc');
   screen.onClose = () => void (g.player.kneeling = null); // rested at the stone, they rise when the menu is left, not when they next move (round 29)
   const close = (): void => screen.close();
-  const journey = (s: SignPlace): void => (close(), go(s.name.toUpperCase(), () => travel(g, s.id), undefined, s.region));
+  const journey = (s: SignPlace): void => (close(), go(story(s.name).toUpperCase(), () => travel(g, s.id), undefined, s.region));
   /** The signs found, but the one rested at (and, in the demo, any beyond its realms, from a full game's save), by region in the world's order. */
   const found = (): Map<string, SignPlace[]> => {
     const ow = g.overworld!;
@@ -59,44 +59,44 @@ export function createSignMenu(g: Game, go: (words: string, jump: () => void, li
     for (const s of worldLayout().signs) if (ow.discovered.has(s.id) && s.id !== ow.sign && !signBeyondDemo(g, s.id)) regions.set(s.region, [...(regions.get(s.region) ?? []), s]);
     return regions;
   };
-  const regionName = (id: string): string => getRegion(id)?.name ?? id;
+  const regionName = (id: string): string => story(getRegion(id)?.name ?? id);
 
-  const TABS = ['Level up', 'Weapons', 'Relics', 'Travel', 'Mounts'];
+  const TABS = (): string[] => [t('sign.tab.level'), t('sign.tab.weapons'), t('sign.tab.relics'), t('sign.tab.travel'), t('sign.tab.mounts')];
   let tab = 0; // the tab open: Level up again at each rest
   /** What the foot says on each tab until a line is chosen (round 52: one long line about resting stood on all five). */
   const HINTS = (): string[] => [
-    'Resting restores you fully; the slain return.',
-    `Each level adds ${Math.round(REINFORCE.damage * 100)}% to a weapon’s blows, ${Math.round(GUN.level.damage * 100)}% to the revolver’s shots.`,
-    'Two are worn at once. Those kept do nothing until worn.',
-    found().size ? 'Choose a region, then the Elder Sign to wake beside.' : 'Each Elder Sign you find, and rest at, can be travelled to from any other.',
+    t('sign.hint.level'),
+    t('sign.hint.weapons', { blade: Math.round(REINFORCE.damage * 100), gun: Math.round(GUN.level.damage * 100) }),
+    t('sign.hint.relics'),
+    found().size ? t('sign.hint.travel') : t('sign.hint.travelNone'),
     `${t('mounts.same')}\n${t('mounts.speeds', { cruise: MOUNT_TRAVERSAL.cruise, gallop: MOUNT_TRAVERSAL.gallop })}`,
   ];
 
   /** Levels and the mind's upgrades: each row a name and its count, what one more gives (green; a passage it would shut, red) and what it costs, boxed at the right. */
   function grow(panel: HTMLElement): void {
-    heading(panel, 'BODY').style.margin = '0 0 4px';
+    heading(panel, t('sign.body')).style.margin = '0 0 4px';
     for (const id of LEVEL_IDS) {
       const [bought, full] = [g.player.levels[id], g.player.levels[id] >= LEVELS[id].max];
-      const b = option(panel, `${levelName(id)}  ${bought}/${LEVELS[id].max}`, () => (buyLevel(g, id), main.redraw?.()), canLevel(g, id), full ? `${levelName(id)} is fully grown.` : `Not enough Echoes: the next level costs ${nextLevelCost(g)}, and you carry ${g.player.echoes}.`);
+      const b = option(panel, `${levelName(id)}  ${bought}/${LEVELS[id].max}`, () => (buyLevel(g, id), main.redraw?.()), canLevel(g, id), full ? t('sign.grown', { name: levelName(id) }) : t('sign.noEchoesLevel', { cost: nextLevelCost(g), have: g.player.echoes }));
       if (!full) chips(b, [{ text: levelGain(id, bought, boon(g, 'health'), boon(g, 'stamina')), tone: 'good' }]);
-      price(b, full ? 'MAX' : `${nextLevelCost(g)} Echoes`, full ? 'max' : canLevel(g, id) ? 'ok' : 'no');
+      price(b, full ? t('sign.max') : t('sign.echoes', { n: nextLevelCost(g) }), full ? 'max' : canLevel(g, id) ? 'ok' : 'no');
     }
-    heading(panel, 'MIND').style.margin = '12px 0 4px';
+    heading(panel, t('sign.mind')).style.margin = '12px 0 4px';
     const read = g.overworld?.read;
     const open = heldOpen(g.mind.insight, read);
-    if (open.length) el(panel, 'div', `Insight holds ${open.length} hidden passage${open.length === 1 ? '' : 's'} open. Spending it shuts ${open.length === 1 ? 'it' : 'them'}.`, 'opacity:.6;font-size:12px;line-height:1.5;padding:0 14px 4px');
+    if (open.length) el(panel, 'div', open.length === 1 ? t('sign.held1') : t('sign.heldN', { n: open.length }), 'opacity:.6;font-size:12px;line-height:1.5;padding:0 14px 4px');
     for (const id of Object.keys(UPGRADES) as UpgradeId[]) {
       const u = UPGRADES[id];
       const level = g.mind.upgrades[id];
       const full = level >= u.max;
       const can = !full && g.mind.insight >= u.cost;
       const shut = can ? closedBy(g.mind.insight, u.cost, read) : [];
-      const costs = shut.length ? `Spending ${u.cost} insight shuts ${listed(shut, 3)} again, before you have passed ${shut.length === 1 ? 'it' : 'them'}.` : '';
-      const b = option(panel, `${upgradeName(id)}  ${level}/${u.max}`, () => (buyUpgrade(g, id), main.redraw?.()), can, full ? `${upgradeName(id)} is fully grown.` : `Not enough insight: ${u.cost}, and you hold ${g.mind.insight}. Insight comes of tomes, and of what the mind has borne.`, costs);
-      const list: Chip[] = [{ text: GAINS[id], tone: 'good' }];
-      if (shut.length) list.push({ text: `shuts ${shut.length} passage${shut.length === 1 ? '' : 's'}`, tone: 'bad' });
+      const costs = shut.length ? t(shut.length === 1 ? 'sign.shuts1' : 'sign.shutsN', { cost: u.cost, list: listed(shut, 3) }) : '';
+      const b = option(panel, `${upgradeName(id)}  ${level}/${u.max}`, () => (buyUpgrade(g, id), main.redraw?.()), can, full ? t('sign.grown', { name: upgradeName(id) }) : t('sign.noInsight', { cost: u.cost, have: g.mind.insight }), costs);
+      const list: Chip[] = [{ text: GAINS()[id], tone: 'good' }];
+      if (shut.length) list.push({ text: shut.length === 1 ? t('sign.shutsChip1') : t('sign.shutsChipN', { n: shut.length }), tone: 'bad' });
       chips(b, list);
-      price(b, full ? 'MAX' : `${u.cost} insight`, full ? 'max' : can ? 'ok' : 'no');
+      price(b, full ? t('sign.max') : t('sign.insight', { n: u.cost }), full ? 'max' : can ? 'ok' : 'no');
     }
     loreSection(panel, g, () => main.redraw?.()); // what insight is for once the Mind is grown (round 61)
   }
@@ -106,17 +106,17 @@ export function createSignMenu(g: Game, go: (words: string, jump: () => void, li
     const [level, cost] = [g.player.gun, gunCost(g)];
     const shot = (n: number): number => Math.round(PLAYER_MOVES.shoot.shot.damage * might(g, g.player.id) * gunEdge(n));
     const whole = (n: number): number => GUN.reach.near + n * GUN.level.reach;
-    const [lacks, stones] = [(n: number): string => `Not enough star-stones: ${n}, and you carry ${g.player.stones}.`, (n: number): string => `${n} ★`];
-    const gun = option(panel, cost === undefined ? `Revolver  +${level}` : `Revolver  +${level} → +${level + 1}`, () => (upgradeGun(g), main.redraw?.()), canUpgradeGun(g), cost === undefined ? 'The revolver is fully set.' : lacks(cost));
-    if (cost !== undefined) chips(gun, [{ text: `Shot ${shot(level)} → ${shot(level + 1)}`, tone: 'good' }, { text: `Reach ${whole(level)} → ${whole(level + 1)} m`, tone: 'good' }]);
-    price(gun, cost === undefined ? 'MAX' : stones(cost), cost === undefined ? 'max' : canUpgradeGun(g) ? 'ok' : 'no');
+    const [lacks, stones] = [(n: number): string => t('sign.noStones', { cost: n, have: g.player.stones }), (n: number): string => `${n} ★`];
+    const gun = option(panel, cost === undefined ? `${t('sign.revolver')}  +${level}` : `${t('sign.revolver')}  +${level} → +${level + 1}`, () => (upgradeGun(g), main.redraw?.()), canUpgradeGun(g), cost === undefined ? t('sign.gunFull') : lacks(cost));
+    if (cost !== undefined) chips(gun, [{ text: t('sign.shot', { a: shot(level), b: shot(level + 1) }), tone: 'good' }, { text: t('sign.reach', { a: whole(level), b: whole(level + 1) }), tone: 'good' }]);
+    price(gun, cost === undefined ? t('sign.max') : stones(cost), cost === undefined ? 'max' : canUpgradeGun(g) ? 'ok' : 'no');
     for (const id of g.player.arms) {
       const level = g.player.reinforced[id];
       const cost = reinforceCost(g, id);
       const light = (n: number): number => Math.round((WEAPONS[id].moves.light1?.hit?.damage ?? 0) * might(g, g.player.id) * edgeAt(n));
-      const b = option(panel, cost === undefined ? `${story(WEAPONS[id].name)}  +${level}` : `${story(WEAPONS[id].name)}  +${level} → +${level + 1}`, () => (reinforce(g, id), main.redraw?.()), canReinforce(g, id), cost === undefined ? `${story(WEAPONS[id].name)} is fully reinforced.` : lacks(cost));
-      if (cost !== undefined) chips(b, [{ text: `Light blow ${light(level)} → ${light(level + 1)}`, tone: 'good' }]);
-      price(b, cost === undefined ? 'MAX' : stones(cost), cost === undefined ? 'max' : canReinforce(g, id) ? 'ok' : 'no');
+      const b = option(panel, cost === undefined ? `${story(WEAPONS[id].name)}  +${level}` : `${story(WEAPONS[id].name)}  +${level} → +${level + 1}`, () => (reinforce(g, id), main.redraw?.()), canReinforce(g, id), cost === undefined ? t('sign.reinforced', { name: story(WEAPONS[id].name) }) : lacks(cost));
+      if (cost !== undefined) chips(b, [{ text: t('sign.light', { a: light(level), b: light(level + 1) }), tone: 'good' }]);
+      price(b, cost === undefined ? t('sign.max') : stones(cost), cost === undefined ? 'max' : canReinforce(g, id) ? 'ok' : 'no');
     }
     moveSection(panel, g, (from) => screen.show(movePage(g, from, () => screen.show(main))));
   }
@@ -124,10 +124,10 @@ export function createSignMenu(g: Game, go: (words: string, jump: () => void, li
   /** The regions with signs found: one line each rather than every sign in one long list (round 12). */
   function travelTab(panel: HTMLElement): void {
     const regions = found();
-    if (!regions.size) return void el(panel, 'div', 'No other Elder Sign found yet.', 'opacity:.6;line-height:1.5;padding:0 14px');
+    if (!regions.size) return void el(panel, 'div', t('sign.noSigns'), 'opacity:.6;line-height:1.5;padding:0 14px');
     for (const [region, signs] of regions) {
-      if (signs.length === 1) button(panel, `${regionName(region)}  ·  ${signs[0].name}`, () => journey(signs[0]));
-      else button(panel, `${regionName(region)}  ·  ${signs.length} signs  ›`, () => screen.show(regionPage(region)));
+      if (signs.length === 1) button(panel, `${regionName(region)}  ·  ${story(signs[0].name)}`, () => journey(signs[0]));
+      else button(panel, `${regionName(region)}  ·  ${t('sign.signs', { n: signs.length })}  ›`, () => screen.show(regionPage(region)));
     }
   }
 
@@ -141,32 +141,32 @@ export function createSignMenu(g: Game, go: (words: string, jump: () => void, li
     const ow = g.overworld!;
     const here = signPlace(ow.sign);
     panel.dataset.body = '366';
-    title(panel, (here?.name ?? 'Elder Sign').toUpperCase());
-    const lead = [g.player.cycle ? `JOURNEY ${g.player.cycle + 1}` : '', g.player.difficulty === DEFAULT_DIFFICULTY ? '' : DIFFICULTIES[g.player.difficulty].name.toUpperCase()].filter(Boolean).join('  ·  ');
+    title(panel, (here ? story(here.name) : t('sign.elderSign')).toUpperCase());
+    const lead = [g.player.cycle ? t('sign.journey', { n: g.player.cycle + 1 }) : '', g.player.difficulty === DEFAULT_DIFFICULTY ? '' : t(`diff.${g.player.difficulty}.name`).toUpperCase()].filter(Boolean).join('  ·  ');
     resources(panel, [
-      { label: 'LEVEL', value: levelsBought(g) + 1 },
-      { label: 'ECHOES', value: g.player.echoes, hot: tab === 0 },
-      { label: 'INSIGHT', value: g.mind.insight, hot: tab === 0 },
-      { label: '★ STAR-STONES', value: g.player.stones, hot: tab === 1 },
+      { label: t('sign.level'), value: levelsBought(g) + 1 },
+      { label: t('sign.echoesLabel'), value: g.player.echoes, hot: tab === 0 },
+      { label: t('sign.insightLabel'), value: g.mind.insight, hot: tab === 0 },
+      { label: t('sign.stonesLabel'), value: g.player.stones, hot: tab === 1 },
     ], lead);
     const next = currentLead(g)?.text; // what the story asks next: a resting place is where it is thought of (round 38)
     if (next) {
-      const line = el(panel, 'div', `NEXT  ·  ${next}`, `margin:-6px 14px 10px;text-align:center;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.7`);
+      const line = el(panel, 'div', t('sign.next', { text: next }), `margin:-6px 14px 10px;text-align:center;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.7`);
       [line.title, line.dataset.pin] = [next, ''];
     }
     if (!__DEMO__ && courtEndings(g, ow.sign).length) {
       const box = pinned(panel);
-      heading(box, 'THE COURT OF AZATHOTH').style.marginTop = '0';
-      el(box, 'div', 'The silver key hangs before the stone. Close your hand on it, and ask for nothing. The tall man waits aside, in his good coat.', 'opacity:.75;margin:4px 14px 8px;font-size:13px;line-height:1.45');
+      heading(box, t('sign.court')).style.marginTop = '0';
+      el(box, 'div', t('sign.courtLine'), 'opacity:.75;margin:4px 14px 8px;font-size:13px;line-height:1.45');
     }
     if (here?.dream) {
       const box = pinned(panel);
-      heading(box, 'THE SLEEPER’S SIGN').style.marginTop = '0';
+      heading(box, t('sign.sleeper')).style.marginTop = '0';
       if (descentOpen(g) && g.demo) el(box, 'div', t('demo.closed'), 'opacity:.6;margin:4px 0 8px;font-size:13px'); // the stair leads out of the demo (round 56)
-      else if (descentOpen(g)) button(box, 'Descend the Seventy Steps of Light Slumber', () => (close(), go('THE SEVENTY STEPS OF LIGHT SLUMBER', () => dream(g), story(DESCENT_LINE))));
-      else el(box, 'div', 'The stair will not open while Keziah Mason troubles the sleepers, in the Witch House in Arkham.', 'opacity:.6;margin:4px 0 8px;font-size:13px');
+      else if (descentOpen(g)) button(box, t('sign.descend'), () => (close(), go(t('sign.descendCard'), () => dream(g), story(DESCENT_LINE))));
+      else el(box, 'div', t('sign.stairShut'), 'opacity:.6;margin:4px 0 8px;font-size:13px');
     }
-    tabs(panel, TABS, tab, (i) => ((tab = i), main.redraw?.()), main);
+    tabs(panel, TABS(), tab, (i) => ((tab = i), main.redraw?.()), main);
     if (tab === 0) grow(panel);
     else if (tab === 1) arms(panel);
     else if (tab === 2) relicsTab(panel, g, (slot) => screen.show(slotPage(g, slot, () => screen.show(main))));
@@ -191,7 +191,7 @@ export function createSignMenu(g: Game, go: (words: string, jump: () => void, li
         back: () => screen.show(main),
         build(panel) {
           title(panel, regionName(region).toUpperCase());
-          for (const s of found().get(region) ?? []) button(panel, s.name, () => journey(s));
+          for (const s of found().get(region) ?? []) button(panel, story(s.name), () => journey(s));
           footer(panel, '', page.back);
         },
       };

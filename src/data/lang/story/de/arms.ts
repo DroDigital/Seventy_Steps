@@ -1,4 +1,4 @@
-/** The arms: each weapon's name, how it handles and where it is had, and each relic's gift and price in German. */
+/** The arms: each weapon's name, how it handles, where it is had and its temper, and each relic's gift and price in German. */
 
 import type { StoryTable } from '..';
 
@@ -21,11 +21,21 @@ export const DE_ARMS: StoryTable = {
     "Obed Marsh's Cutlass": "Obed Marshs Entermesser",
     "Off the Sumatra Queen, rusted at the basket. Wide cuts that find more than one foe.": "Von der Sumatra Queen, am Korb verrostet. Weite Hiebe, die mehr als einen Gegner finden.",
     "It lies in the cells off the Drowned Hall of Y'ha-nthlei, beneath Innsmouth.": "Es liegt in den Zellen neben der Ertrunkenen Halle von Y'ha-nthlei, unter Innsmouth.",
+    ...(__DEMO__
+      ? {}
+      : {
+          "Salt-rusted; it takes its share of every kill.": "Salzverrostet; es nimmt seinen Anteil an jeder Tötung.",
+        }),
   },
   rapier: {
     "Zamacona's Espada": "Zamaconas Espada",
     "A Spanish sword of 1541, from the depths of K'n-yan. It reaches past a foe's guard; mind its narrow line.": "Ein spanisches Schwert von 1541, aus den Tiefen von K'n-yan. Es reicht an der Deckung eines Gegners vorbei; achtet auf seine schmale Linie.",
     "Zamacona gives it, in K'n-yan, once Tsathoggua is stilled.": "Zamacona gibt es euch, in K'n-yan, sobald Tsathoggua stillgelegt ist.",
+    ...(__DEMO__
+      ? {}
+      : {
+          "A clean kill steadies the hand and the mind.": "Eine saubere Tötung beruhigt die Hand und den Geist.",
+        }),
   },
   starHook: {
     "Hook of the Star-Stone": "Haken des Sternsteins",

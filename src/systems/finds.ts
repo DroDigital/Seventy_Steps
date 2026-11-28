@@ -6,6 +6,7 @@
  * marks, when a find may be shown, and what a weapon is against the one in hand. Pure: no DOM.
  */
 
+import { story, t } from '../core/i18n';
 import { TEMPERS } from '../data/relics';
 import { FINDS } from '../data/tuning';
 import { WEAPONS, type WeaponId } from '../data/weapons';
@@ -70,17 +71,20 @@ export function weaponFigureList(g: Game, id: WeaponId): Figure[] {
   const same = id === g.player.weapon;
   const tone = (d: number, higherIsBetter: boolean): Figure['tone'] => (same || d === 0 ? 'dim' : d > 0 === higherIsBetter ? 'good' : 'bad');
   const rows: Figure[] = [
-    { text: `Light blow ${a.light}${same ? '' : signed(a.light - b.light)}`, tone: tone(a.light - b.light, true) },
-    { text: `Heavy blow ${a.heavy}${same ? '' : signed(a.heavy - b.heavy)}`, tone: tone(a.heavy - b.heavy, true) },
-    { text: `Lands in ${a.lands.toFixed(2)} s${same ? '' : signed(a.lands - b.lands, ' s')}`, tone: tone(a.lands - b.lands, false) },
-    { text: `Reach ${a.reach.toFixed(1)} m${same ? '' : signed(a.reach - b.reach, ' m')}`, tone: tone(a.reach - b.reach, true) },
-    { text: `${a.stamina} stamina${same ? '' : signed(a.stamina - b.stamina)}`, tone: tone(a.stamina - b.stamina, false) },
+    { text: t('fig.light', { n: `${a.light}${same ? '' : signed(a.light - b.light)}` }), tone: tone(a.light - b.light, true) },
+    { text: t('fig.heavy', { n: `${a.heavy}${same ? '' : signed(a.heavy - b.heavy)}` }), tone: tone(a.heavy - b.heavy, true) },
+    { text: t('fig.lands', { n: `${a.lands.toFixed(2)}${same ? '' : signed(a.lands - b.lands, ' s')}` }), tone: tone(a.lands - b.lands, false) },
+    { text: t('fig.reach', { n: `${a.reach.toFixed(1)}${same ? '' : signed(a.reach - b.reach, ' m')}` }), tone: tone(a.reach - b.reach, true) },
+    { text: t('fig.stamina', { n: `${a.stamina}${same ? '' : signed(a.stamina - b.stamina)}` }), tone: tone(a.stamina - b.stamina, false) },
   ];
   return rows;
 }
 
 /** A weapon's temper in a line, if it has one. */
-export const temperOf = (id: WeaponId): string | undefined => (TEMPERS as Partial<Record<WeaponId, { line: string }>>)[id]?.line;
+export const temperOf = (id: WeaponId): string | undefined => {
+  const line = (TEMPERS as Partial<Record<WeaponId, { line: string }>>)[id]?.line;
+  return line && story(line); // in the language chosen (1.5.0)
+};
 
 /** The find whose card is due: the first in the queue, once it has waited its moment (`now` and `at` in milliseconds). */
 export const due = <T extends { kind: FindKind; at: number }>(queue: readonly T[], now: number): T | undefined =>

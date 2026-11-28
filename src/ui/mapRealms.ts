@@ -79,10 +79,10 @@ export function realmStats(g: Game, rs: readonly RegionDef[]): string {
   const secrets = poiTotals(g, rs); // round 61
   const gift = nextGift(g); // round 68: the gifts for the secrets found, in all the realms
   const totalSecrets = secretsFound(g);
-  const parts: string[] = [charted >= 0.005 ? `${Math.round(charted * 100)}% CHARTED` : 'SURVEY BEGUN'];
-  if (found > 0) parts.push(`${found} ${found === 1 ? 'PLACE' : 'PLACES'} CHARTED`);
-  if (secrets.found > 0) parts.push(`${secrets.found} ${secrets.found === 1 ? 'SECRET' : 'SECRETS'} UNCOVERED`);
-  if (totalSecrets > 0 && secrets.of && gift) parts.push(`GIFT AT ${gift.at} SECRETS (${totalSecrets} FOUND)`);
+  const parts: string[] = [charted >= 0.005 ? t('map.charted', { n: Math.round(charted * 100) }) : t('map.surveyBegun')];
+  if (found > 0) parts.push(found === 1 ? t('map.place1') : t('map.placesN', { n: found }));
+  if (secrets.found > 0) parts.push(secrets.found === 1 ? t('map.secret1') : t('map.secretsN', { n: secrets.found }));
+  if (totalSecrets > 0 && secrets.of && gift) parts.push(t('map.gift', { at: gift.at, n: totalSecrets }));
   return parts.join('   ·   ');
 }
 

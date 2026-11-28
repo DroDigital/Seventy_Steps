@@ -1,4 +1,4 @@
-/** The arms: each weapon's name, how it handles and where it is had, and each relic's gift and price in Spanish. */
+/** The arms: each weapon's name, how it handles, where it is had and its temper, and each relic's gift and price in Spanish. */
 
 import type { StoryTable } from '..';
 
@@ -21,11 +21,21 @@ export const ES_ARMS: StoryTable = {
     "Obed Marsh's Cutlass": "El alfanje de Obed Marsh",
     "Off the Sumatra Queen, rusted at the basket. Wide cuts that find more than one foe.": "Del Sumatra Queen, oxidado en la cazoleta. Cortes amplios que alcanzan a más de un enemigo.",
     "It lies in the cells off the Drowned Hall of Y'ha-nthlei, beneath Innsmouth.": "Está en las celdas junto a la Sala Ahogada de Y'ha-nthlei, bajo Innsmouth.",
+    ...(__DEMO__
+      ? {}
+      : {
+          "Salt-rusted; it takes its share of every kill.": "Oxidado por la sal; se lleva su parte de cada muerte.",
+        }),
   },
   rapier: {
     "Zamacona's Espada": "La espada de Zamacona",
     "A Spanish sword of 1541, from the depths of K'n-yan. It reaches past a foe's guard; mind its narrow line.": "Una espada española de 1541, de las profundidades de K'n-yan. Supera la guardia del enemigo; cuidado con su línea estrecha.",
     "Zamacona gives it, in K'n-yan, once Tsathoggua is stilled.": "Zamacona te la da, en K'n-yan, una vez aquietado Tsathoggua.",
+    ...(__DEMO__
+      ? {}
+      : {
+          "A clean kill steadies the hand and the mind.": "Una muerte limpia serena la mano y la mente.",
+        }),
   },
   starHook: {
     "Hook of the Star-Stone": "Gancho de la piedra estelar",

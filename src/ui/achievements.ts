@@ -5,7 +5,7 @@
  * menu's page lists them all.
  */
 
-import { story } from '../core/i18n';
+import { story, t } from '../core/i18n';
 import { ACHIEVEMENT_IDS, ACHIEVEMENTS } from '../data/achievements';
 import { newlyEarned } from '../systems/achievements';
 import type { Game } from '../systems/components';
@@ -34,7 +34,7 @@ export function achievementsPage(store: SaveStore | null, back: () => void): Pag
     back,
     build(p) {
       const held = new Set(loadRecords(store).achievements);
-      title(p, 'ACHIEVEMENTS');
+      title(p, t('ach.title'));
       el(p, 'div', `${ACHIEVEMENT_IDS.filter((id) => held.has(id)).length} of ${ACHIEVEMENT_IDS.length}`, 'opacity:.5;font-size:12px;letter-spacing:2px;padding:0 4px 6px');
       for (const id of ACHIEVEMENT_IDS) {
         const a = ACHIEVEMENTS[id];

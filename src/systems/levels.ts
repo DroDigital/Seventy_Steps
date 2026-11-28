@@ -5,6 +5,7 @@
  * mind's upgrades instead (insight.ts). Pure: no Three.js.
  */
 
+import { t } from '../core/i18n';
 import type { Entity } from '../core/ecs';
 import { LAUDANUM, LEVEL_COST, LEVELS, UPGRADES, type LevelId } from '../data/tuning';
 import type { Game } from './components';
@@ -68,4 +69,4 @@ export const might = (g: Pick<Game, 'player'>, attacker: Entity): number => (att
 /** The most Laudanum the investigator carries: the start's doses and one more per Draught. */
 export const laudanumMax = (g: Pick<Game, 'mind'>): number => LAUDANUM.doses + g.mind.upgrades.draught * (UPGRADES.draught.doses ?? 0);
 
-export const levelName = (id: LevelId): string => id[0].toUpperCase() + id.slice(1);
+export const levelName = (id: LevelId): string => t(`lvl.${id}`); // in the language chosen (1.5.0)

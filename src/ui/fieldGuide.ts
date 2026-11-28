@@ -22,7 +22,7 @@ export const hintText = (id: HintId): string => fill(t(`hint.${id}` as Key));
 export function fieldGuideBody(body: HTMLElement, g: Game, show: (p: Page) => void, back: Page): void {
   const have = given(g);
   el(body, 'div', `${have.length} of ${HINT_IDS.length} given`, 'opacity:.45;font-size:12px;letter-spacing:2px;padding:0 14px 6px');
-  if (!have.length) el(body, 'div', 'What you are told as you go is kept here, to read again.', 'opacity:.6;padding:0 14px');
+  if (!have.length) el(body, 'div', t('guide.note'), 'opacity:.6;padding:0 14px');
   for (const group of GUIDE_GROUPS) {
     const some = have.filter((id) => GUIDE[id].group === group);
     if (!some.length) continue;
