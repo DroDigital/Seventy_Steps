@@ -8,6 +8,12 @@
 import { FIELD_NOTES } from '../src/data/bestiaryNotes';
 import { OWN_SPECS, OWNER } from '../src/data/bossMoves';
 import { EPITHETS } from '../src/data/bossCards';
+import { WAKE, type Scene } from '../src/data/cutscenes';
+import { ENDING_SCENES } from '../src/data/cutscenesEndings';
+import { bespokeFall } from '../src/data/cutscenesFall';
+import { arrivalOf } from '../src/data/cutscenesMore';
+import { ENDINGS } from '../src/data/endings';
+import { bossLine } from '../src/data/speechLines';
 import { EDGES, FRAGMENTS, GENERIC, SEAS, TIPS as BLOW_TIPS } from '../src/data/deathLines';
 import { PETRIFIED } from '../src/systems/deathNotes';
 import { DOCUMENTS } from '../src/data/documents';
@@ -83,6 +89,20 @@ export const STORY_SOURCES: Readonly<Record<StoryDomain, () => StorySource>> = {
     const by = new Map<string, string[]>();
     for (const [id, spec] of Object.entries(OWN_SPECS)) if (spec.tip) (by.get(OWNER[id]!) ?? by.set(OWNER[id]!, []).get(OWNER[id]!)!).push(spec.tip);
     return new Map([...by].map(([who, l]) => [who, [...new Set(l)]]));
+  },
+  // what the cutscenes show: each horror's arrival and fall captions and the lines it says (its name and epithet, put in by the
+  // arrival, are the creatures'), the wake's words, and each ending's captions, its choice, title and lines
+  scenes: () => {
+    const words = (scene: Scene | undefined, skip: readonly (string | undefined)[] = []): string[] =>
+      (scene?.beats ?? []).flatMap((b) => lines(b.caption, ...(b.title ?? []))).filter((w) => !skip.includes(w));
+    const by = new Map<string, string[]>([['wake', words(WAKE)]]);
+    for (const d of ENTITIES) {
+      const [name, epithet] = [d.name, EPITHETS[d.id]];
+      const l = [...words(arrivalOf(d.id, name, epithet), [name.toUpperCase(), name, epithet]), ...words(bespokeFall(d.id)), ...lines(bossLine(d.id, 'arrive')?.text, bossLine(d.id, 'fall')?.text)];
+      if (l.length) by.set(d.id, [...new Set(l)]);
+    }
+    for (const [id, e] of Object.entries(ENDINGS)) by.set(id, [...new Set([...words(ENDING_SCENES[id]), ...lines(e.choice, e.title, ...e.lines)])]);
+    return new Map([...by].filter(([, l]) => l.length));
   },
   // the lines under the veil: Lovecraft's (the one that names Cthulhu apart, which the demo leaves out), the lessons by their hint, the descent's
   lore: () => {

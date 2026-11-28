@@ -20,6 +20,7 @@ import { DE_POIS } from './pois';
 import { DE_POISMORE } from './poisMore';
 import { DE_QUESTS } from './quests';
 import { DE_RUMORS } from './rumors';
+import { DE_SCENES } from './scenes';
 
 export const DE_STORY: StoryBook = {
   intro: DE_INTRO,
@@ -35,4 +36,5 @@ export const DE_STORY: StoryBook = {
   deaths: DE_DEATHS,
   blows: { ...DE_BLOWS, ...DE_BLOWSMORE },
   lore: DE_LORE,
+  scenes: DE_SCENES,
 };

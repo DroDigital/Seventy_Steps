@@ -20,6 +20,7 @@ import { FR_POIS } from './pois';
 import { FR_POISMORE } from './poisMore';
 import { FR_QUESTS } from './quests';
 import { FR_RUMORS } from './rumors';
+import { FR_SCENES } from './scenes';
 
 export const FR_STORY: StoryBook = {
   intro: FR_INTRO,
@@ -35,4 +36,5 @@ export const FR_STORY: StoryBook = {
   deaths: FR_DEATHS,
   blows: { ...FR_BLOWS, ...FR_BLOWSMORE },
   lore: FR_LORE,
+  scenes: FR_SCENES,
 };

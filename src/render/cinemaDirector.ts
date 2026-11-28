@@ -68,7 +68,7 @@ export function createDirector(g: Game, cinema: Cinema, opens: (endingId: string
     const line = id ? bossLine(id, moment) : undefined;
     if (!line || !alive()) return;
     g.events.emit('Said', { speaker: line.speaker, text: line.text });
-    g.events.emit('Notice', { text: line.text.toUpperCase() });
+    g.events.emit('Notice', { text: story(line.text).toUpperCase() });
   };
   /** Whether a scene is worth playing about this horror: one seen and heard, that stands as itself in the fight. */
   const worth = (e: Entity): boolean => {

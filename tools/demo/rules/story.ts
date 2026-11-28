@@ -61,6 +61,7 @@ export const rules: readonly PruneRule[] = [
   ...storyTable('deaths', realmsOrOther()),
   ...storyTable('blows', entities),
   ...storyTable('blowsMore', entities),
+  ...storyTable('scenes', (id) => id === 'wake' || entities(id)),
   ...storyTable('lore', (id) => id !== 'cthulhu' && !hintsLeftOut.has(id)),
 ];
 

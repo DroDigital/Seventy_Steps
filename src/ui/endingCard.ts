@@ -111,9 +111,9 @@ export function createEndingCard(g: Game, store: SaveStore | null, theme?: () =>
     const goOn = (p: HTMLElement, next: Page): void => void (boxed(button(el('', '', p), 'Go on', () => screen.show(next))));
     const card: Page = {
       build(page) {
-        const title = el('font-size:26px;letter-spacing:10px;margin-bottom:26px', e.title, page);
+        const title = el('font-size:26px;letter-spacing:10px;margin-bottom:26px', story(e.title), page);
         const lines = el('opacity:.85', '', page);
-        for (const line of e.lines) el('margin:6px 0', line, lines);
+        for (const line of e.lines) el('margin:6px 0', story(line), lines);
         goOn(page, told.length ? after : credits);
         staged([title, ...lines.children, page.lastElementChild!], 600, 1500);
       },

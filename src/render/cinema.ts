@@ -13,6 +13,7 @@ import { Matrix4, Quaternion, Vector3, type PerspectiveCamera } from 'three';
 import { keyLayout } from '../core/bindings';
 import type { Entity } from '../core/ecs';
 import { clamp, type V3 } from '../core/geom';
+import { story } from '../core/i18n';
 import { PAD_BUTTON } from '../core/padMap';
 import { activePad } from '../core/pads';
 import type { Beat, Scene, Subject } from '../data/cutscenes';
@@ -145,8 +146,8 @@ export function createCinema(g: Game, ui: CinemaUi, audio: GameAudio, particles:
   };
 
   const perform = (r: Run, b: Beat): void => {
-    if (b.caption) ui.caption(b.caption, b.hold ?? 3);
-    if (b.title) ui.title(b.title[0], b.title[1], b.hold ?? 3);
+    if (b.caption) ui.caption(story(b.caption), b.hold ?? 3); // the words in the language chosen; the voice keeps the English (1.5.0)
+    if (b.title) ui.title(story(b.title[0]), b.title[1] && story(b.title[1]), b.hold ?? 3);
     if (b.fade) ui.fade(b.fade, b.over ?? 1);
     if (b.sound) audio.stinger(b.sound, { gain: b.gain, pitch: b.pitch });
     if (b.set) audio.sample(b.set, { gain: b.gain, pitch: b.pitch });

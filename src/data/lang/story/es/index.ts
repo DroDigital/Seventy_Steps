@@ -20,6 +20,7 @@ import { ES_POIS } from './pois';
 import { ES_POISMORE } from './poisMore';
 import { ES_QUESTS } from './quests';
 import { ES_RUMORS } from './rumors';
+import { ES_SCENES } from './scenes';
 
 export const ES_STORY: StoryBook = {
   intro: ES_INTRO,
@@ -35,4 +36,5 @@ export const ES_STORY: StoryBook = {
   deaths: ES_DEATHS,
   blows: { ...ES_BLOWS, ...ES_BLOWSMORE },
   lore: ES_LORE,
+  scenes: ES_SCENES,
 };
