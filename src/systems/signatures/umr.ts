@@ -63,12 +63,12 @@ export const UMR_SIGNATURE: Signature = {
     const me = g.ecs.c.transform.get(g.player.id)!;
     if (f.sig.gate === 1) {
       if (Math.hypot(me.pos.x - f.sig.gx!, me.pos.z - f.sig.gz!) > GATE_REACH) return null;
-      return { label: 'step through the Gate', run: () => endGame(g, 'silver_key') };
+      return { label: t('act.gate'), run: () => endGame(g, 'silver_key') };
     }
     const gap = distXZ(him.pos, me.pos) - (g.ecs.c.body.get(e)?.radius ?? 0);
     if (gap > REACH) return null;
     return {
-      label: 'follow the Guide',
+      label: t('act.guide'),
       run() {
         const away = yawOf(him.pos.x - me.pos.x, him.pos.z - me.pos.z);
         const at = reachableGate(g, f, him.pos, away);

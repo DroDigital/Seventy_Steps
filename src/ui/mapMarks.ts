@@ -8,7 +8,7 @@
  */
 
 import type { XZ } from '../core/geom';
-import { story } from '../core/i18n';
+import { story, t } from '../core/i18n';
 import { NPCS } from '../data/npcs';
 import type { PoiKind } from '../data/pois';
 import { getEntity } from '../data/registry';
@@ -43,7 +43,7 @@ export interface Mark {
 }
 
 /** What each kind of secret is called on its hover card (round 61). */
-const SECRET_TITLE: Record<PoiKind, string> = { tale: 'A place from a tale', hoard: 'A hoard', rite: 'A rite', anomaly: 'An anomaly', den: 'A den' };
+const SECRET_TITLE = (kind: PoiKind): string => t(`mark.${kind}`);
 
 /** Pixels a metre, divided by the UI's scale, from which each thing is drawn on the full map, and then named. */
 export const DETAIL = { people: 0.9, peopleNames: 1.8, places: 1.2, placeNames: 2.2, doorNames: 1.0 } as const;
@@ -92,26 +92,26 @@ export function gatherMarks(g: Game, view: MapView, realm: readonly RegionDef[],
       const text = { text: story(p.name), x, y, size: 11 * k, color: BONE, gap: 0 };
       add(middle, {
         kind: 'sign', x, y, state: { lit: found }, place: p,
-        title: found ? 'Elder Sign' : 'An Elder Sign, unlit',
+        title: found ? t('mark.sign') : t('mark.unlit'),
         name: found ? story(p.name) : '',
-        note: found ? 'A place to rest. Click to choose it for a journey' : 'Walk up to it to light it',
+        note: found ? t('mark.signNote') : t('mark.unlitNote'),
       }, 1, found && full ? text : null, 'signs');
     } else if (p.kind === 'gate') {
-      add(middle, { kind: 'gate', x, y, state: {}, place: p, title: 'Gate', name: story(p.name), note: 'Walk into it to pass through' }, 1,
+      add(middle, { kind: 'gate', x, y, state: {}, place: p, title: t('mark.gate'), name: story(p.name), note: t('mark.gateNote') }, 1,
         full && detail >= DETAIL.doorNames ? { text: story(p.name), x, y, size: 10 * k, color: GATE_NAME, gap: 0 } : null, 'doors');
     } else if (p.kind === 'dungeon') {
       const met = p.bosses.filter((b) => g.mind.seen.has(b) || slain(b));
       const done = met.length > 0 && met.every(slain);
       add(middle, {
         kind: 'dungeon', x, y, state: {}, place: p, badge: met.length ? (done ? 'slain' : 'live') : null,
-        title: 'Dungeon', name: story(p.name), note: !met.length ? 'Its door stands open' : done ? 'Its horror is slain' : 'A horror lurks within',
+        title: t('mark.dungeon'), name: story(p.name), note: !met.length ? t('mark.doorOpen') : done ? t('mark.dungeonSlain') : t('mark.lurks'),
       }, 1, full && detail >= DETAIL.doorNames ? { text: story(p.name), x, y, size: 10 * k, color: DOOR_NAME, gap: 0 } : null, 'doors');
     } else {
       const done = p.bosses.every(slain);
       const known = p.bosses.filter((b) => g.mind.seen.has(b) || slain(b)).map((b) => story(getEntity(b)?.name ?? ''));
       add(middle, {
         kind: 'boss', x, y, state: { slain: done }, place: p,
-        title: done ? 'A horror, slain' : "A horror's lair", name: known.join(' · '), note: done ? 'It will not rise again' : 'Something great dwells here',
+        title: done ? t('mark.slain') : t('mark.lair'), name: known.join(' · '), note: done ? t('mark.noRise') : t('mark.dwells'),
       }, 1.05, null, 'doors');
     }
   }
@@ -122,7 +122,7 @@ export function gatherMarks(g: Game, view: MapView, realm: readonly RegionDef[],
       if (!at || !inRealm.has(regionAt(at.x, at.z)?.id ?? '') || !isExplored(ow.explored, at.x, at.z)) continue;
       const [x, y] = slid(n.id, screenX(view, at.x), screenY(view, at.z));
       const met = ow.met.has(n.id);
-      add(under, { kind: 'person', x, y, state: { met }, title: met ? 'Someone you have met' : 'A figure', name: met ? story(n.name) : '', note: met ? '' : 'Speak with them to learn who they are' }, 0.8,
+      add(under, { kind: 'person', x, y, state: { met }, title: met ? t('mark.met') : t('mark.figure'), name: met ? story(n.name) : '', note: met ? '' : t('mark.speak') }, 0.8,
         full && met && detail >= DETAIL.peopleNames ? { text: story(n.name), x, y, size: 10 * k, color: DIM, gap: 0 } : null, 'people');
     }
   }
@@ -131,7 +131,7 @@ export function gatherMarks(g: Game, view: MapView, realm: readonly RegionDef[],
     for (const pl of realm.flatMap((r) => placesOf(r.id))) { // the named places found, marked and named last (round 18)
       if (!ow.places.has(pl.id)) continue;
       const [x, y] = [screenX(view, pl.x), screenY(view, pl.z)];
-      add(under, { kind: 'place', x, y, state: {}, title: 'A place you found', name: story(pl.name), note: '' }, 0.7,
+      add(under, { kind: 'place', x, y, state: {}, title: t('mark.place'), name: story(pl.name), note: '' }, 0.7,
         full && detail >= DETAIL.placeNames ? { text: story(pl.name), x, y, size: 8.5 * k, color: DIM, gap: 0 } : null, 'places');
     }
   }
@@ -146,22 +146,22 @@ export function gatherMarks(g: Game, view: MapView, realm: readonly RegionDef[],
       const named = !rumour && full && detail >= DETAIL.placeNames && placeAt(site.x, site.z)?.name !== site.def.name; // (a place the map already names under the same name is not named twice)
       add(middle, {
         kind: 'secret', x, y, state: rumour ? { rumour: true } : { poi: site.def.kind, spent: mark === 'spent' },
-        title: rumour ? 'Something strange' : SECRET_TITLE[site.def.kind], name: rumour ? '' : story(site.def.name),
-        note: rumour ? 'Near ground you have charted: go and see' : mark === 'spent' ? 'Its chest is taken' : site.def.hoard ? 'A chest of Echoes lies near' : '',
+        title: rumour ? t('mark.strange') : SECRET_TITLE(site.def.kind), name: rumour ? '' : story(site.def.name),
+        note: rumour ? t('mark.strangeNote') : mark === 'spent' ? t('mark.chestTaken') : site.def.hoard ? t('mark.chest') : '',
       }, 0.9, named ? { text: story(site.def.name), x, y, size: 8.5 * k, color: DIM, gap: 0 } : null, 'places');
     }
   }
 
   for (const d of g.ecs.query('drop')) {
     const at = g.ecs.c.transform.get(d)!.pos;
-    add(over, { kind: 'echo', x: screenX(view, at.x), y: screenY(view, at.z), state: {}, title: 'Your lost Echoes', name: '', note: 'Walk over them to take them back' }, 0.85, null, 'places');
+    add(over, { kind: 'echo', x: screenX(view, at.x), y: screenY(view, at.z), state: {}, title: t('mark.echo'), name: '', note: t('mark.echoNote') }, 0.85, null, 'places');
   }
 
   const here = full ? new Set(markersHere(g)) : null;
   for (const pin of full ? markersIn(g, realm) : []) { // the investigator's own markers in the realm on show (the minimap draws them as beacons, upright: leadMark.ts)
     const r = unit * 0.95;
     const away = here!.has(pin) ? `${Math.round(markerDistance(g, pin))} m away` : ''; // no distance across realms
-    add(over, { kind: 'marker', x: screenX(view, pin.x), y: screenY(view, pin.z) - PIN_TIP * r, state: {}, title: 'Your marker', name: away, note: 'Right-click it, or press F, to remove it', at: pin }, 0.95, null, 'places'); // its point on the place
+    add(over, { kind: 'marker', x: screenX(view, pin.x), y: screenY(view, pin.z) - PIN_TIP * r, state: {}, title: t('mark.marker'), name: away, note: t('mark.markerNote'), at: pin }, 0.95, null, 'places'); // its point on the place
   }
 
   if (full) {

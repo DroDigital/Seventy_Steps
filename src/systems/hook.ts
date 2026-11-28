@@ -47,5 +47,5 @@ export function hookSystem(g: Game): void {
   const me = g.ecs.c.transform.get(g.player.id)!.pos;
   if (engagedFights(g).length || dungeonRoomAt(me.x, me.z) || g.player.listening !== null || (g.ecs.c.health.get(g.player.id)?.hp ?? 0) <= 0) return;
   ow.told.add(`omen:${o.id}`);
-  g.events.emit('Foreboding', { words: o.words, sound: o.sound, shake: o.shake, pitch: o.pitch });
+  g.events.emit('Foreboding', { words: t(`omen.${o.id as 'call' | 'nearer'}`), sound: o.sound, shake: o.shake, pitch: o.pitch });
 }

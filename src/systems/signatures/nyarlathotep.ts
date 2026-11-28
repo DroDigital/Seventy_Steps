@@ -94,7 +94,7 @@ export const NYARLATHOTEP_SIGNATURE: Signature = {
   action(g, _e, f) {
     if (f.sig.nodens || !g.mind.seen.has('nodens')) return null;
     return {
-      label: 'call upon Nodens, Lord of the Great Abyss',
+      label: t('act.nodens'),
       run() {
         f.sig.nodens = 1;
         const tr = g.ecs.c.transform.get(g.player.id)!;

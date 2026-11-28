@@ -8,6 +8,7 @@
 import { ACHIEVEMENTS } from '../src/data/achievements';
 import { FIELD_NOTES } from '../src/data/bestiaryNotes';
 import { OWN_SPECS, OWNER } from '../src/data/bossMoves';
+import { ARENA_WAYS } from '../src/data/arenaWaysAll';
 import { EPITHETS } from '../src/data/bossCards';
 import { WAKE, type Scene } from '../src/data/cutscenes';
 import { ENDING_SCENES } from '../src/data/cutscenesEndings';
@@ -127,6 +128,8 @@ export const STORY_SOURCES: Readonly<Record<StoryDomain, () => StorySource>> = {
   },
   // the credits: their headings and lines (a name is the same in every language)
   credits: () => new Map([['credits', [...new Set(CREDITS.flatMap((c) => lines(c.heading, ...c.lines)))]]]),
+  // the omens said along each open arena's court, and the clue of its rite of lights, by its horror
+  ways: () => new Map(Object.entries(ARENA_WAYS).map(([id, w]) => [id, lines(...w.omens.map((o) => o.words), w.rite?.clue)] as [string, string[]]).filter(([, l]) => l.length)),
   // the lines under the veil: Lovecraft's (the one that names Cthulhu apart, which the demo leaves out), the lessons by their hint, the descent's
   lore: () => {
     const by = new Map<string, string[]>([['quotes', QUOTES.filter((q) => !q.includes('Cthulhu'))], ['cthulhu', QUOTES.filter((q) => q.includes('Cthulhu'))], ['descent', [DESCENT_LINE]]]);

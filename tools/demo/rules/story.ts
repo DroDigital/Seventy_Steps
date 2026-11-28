@@ -12,7 +12,7 @@ const realms = new Set<string>(ALL_REALMS);
  * The horrors' status lines and notices (`sig.*`: each belongs to a signature the demo does not keep; the Colour's has none of them) and
  * the Dunwich's powder, which only the full game's Dunwich Horror shows (`boss.powder`): the demo's bundle never holds their names.
  */
-const horrorLinesLeftOut = (key: string): boolean => key.startsWith('sig.') || key === 'boss.powder' || key === 'sign.court'; // (the Court of Azathoth's heading, 1.5.0)
+const horrorLinesLeftOut = (key: string): boolean => key.startsWith('sig.') || key === 'boss.powder' || ['sign.court', 'act.nodens', 'act.powder'].includes(key); // (the Court of Azathoth's heading, and the keys of Nyarlathotep's and the Dunwich Horror's fights, 1.5.0)
 
 /** A line of the field guide or a hint the demo leaves out (`hint.ship`), and a realm's epigraph the demo does not keep (`epigraph.pnakotus`). */
 const lineKept = (key: string): boolean => {
@@ -70,6 +70,7 @@ export const rules: readonly PruneRule[] = [
   ...storyTable('arms', kept('weapons')),
   ...storyTable('achievements', kept('achievements')),
   ...storyTable('rooms', kept('dungeons')),
+  ...storyTable('ways', kept('arenas')),
   ...storyTable('lore', (id) => id !== 'cthulhu' && !hintsLeftOut.has(id)),
 ];
 

@@ -1,6 +1,7 @@
 /** The story in French (data/lang/story/index.ts): a table for every domain. */
 
 import type { StoryBook } from '..';
+import { FR_WAYS } from './ways';
 import { FR_ARMS } from './arms';
 import { FR_WARES } from './wares';
 import { FR_ACHIEVEMENTS } from './achievements';
@@ -47,4 +48,5 @@ export const FR_STORY: StoryBook = {
   achievements: FR_ACHIEVEMENTS,
   rooms: FR_ROOMS,
   credits: FR_CREDITS,
+  ways: FR_WAYS,
 };

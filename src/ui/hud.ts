@@ -45,7 +45,6 @@ import { createNoticeBoard } from './noticeFade';
 import { createMindHud, MAGENTA } from './mindHud';
 import { createMinimap, minimapYaw } from './minimap';
 import { PICTURE_LAYER, uiScale } from './uiScale';
-import { MOUNTS } from '../data/mounts';
 import { mountUnlocked } from '../systems/mounts';
 import { signCalls, type SignCall } from '../systems/signCalls';
 
@@ -172,7 +171,7 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
   g.events.on('Vanquished', (e) => great.show(tr('hud.vanquished'), 'victory', story(e.name).toUpperCase(), story(EPITAPHS[creatureOf(g, e.entity)?.id ?? ''] ?? '') || undefined));
   g.events.on('Exhaled', (e) => setTimeout(() => great.show(tr('hud.breathes'), 'place', story(e.name).toUpperCase(), tr('hud.breathesNote')), 7500)); // after the fall's own words (round 26)
   g.events.on('Foreboding', (e) => setTimeout(() => great.show(tr('hud.stirs'), 'place', e.words, ''), 2500)); // after the sound has reached them (round 26)
-  g.events.on('WayOmen', (e) => say(e.words)); // a line said on a trail to a horror (round 62)
+  g.events.on('WayOmen', (e) => say(story(e.words))); // a line said on a trail to a horror (round 62)
   g.events.on('HouseSeen', (e) => great.show(story(e.name), 'place', story(e.line).toUpperCase())); // a horror's house come within sight (round 63)
   g.events.on('Wandered', (e) => void (e.words && say(e.words))); // the first time one is seen (round 26)
   g.events.on('Discovered', (e) => say(tr('hud.signFound', { name: story(e.name).toUpperCase() })));
@@ -251,9 +250,9 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
       if (mountKey !== mountTip) { mountTip = mountKey; mountTipUntil = 0; }
       if (mountKey && busy === 'visible' && mountTipUntil === 0) mountTipUntil = now + MOUNT_TIP_MS;
       const mountShown = mountKey !== '' && now < mountTipUntil;
-      const mountLine = fill(tr(mounted ? 'hud.mountRide' : 'hud.mountSummon', { name: MOUNTS[mounted ?? g.player.mount.selected].name }));
+      const mountLine = fill(tr(mounted ? 'hud.mountRide' : 'hud.mountSummon', { name: tr(`mounts.name.${mounted ?? g.player.mount.selected}`) }));
       const gate = !act && !near ? gateNear(g) : null; // a gate has no key to press: nearing it says where it leads (round 60)
-      const promptText = gate ? tr('hud.gateLeads', { name: story(gate.leads) }) : mountShown && (mounted || (!act && !near)) ? mountLine : act ? `${e} · ${act.label}` : near ? `${e} · ${verb} ${near.name}${near.kind === 'sign' ? restWhy(near.id) : ''}` : '';
+      const promptText = gate ? tr('hud.gateLeads', { name: story(gate.leads) }) : mountShown && (mounted || (!act && !near)) ? mountLine : act ? `${e} · ${act.label}` : near ? `${e} · ${verb} ${story(near.name)}${near.kind === 'sign' ? restWhy(near.id) : ''}` : '';
       setText(prompt, promptText);
       setStyle(prompt, 'display', promptText ? 'block' : 'none');
       bosses.update();

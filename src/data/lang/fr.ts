@@ -2,6 +2,7 @@
 
 import type { Key } from './en';
 import { FR_PAGES } from './pages/fr';
+import { FR_MAP } from './map/fr';
 import { FR_SCREENS } from './screens/fr';
 
 export const FR: Readonly<Record<Key, string>> = {
@@ -447,4 +448,5 @@ export const FR: Readonly<Record<Key, string>> = {
   'tip.mount.call': "Appeler le char",
   ...FR_PAGES, // (1.5.0)
   ...FR_SCREENS, // the Elder Sign's screens (1.5.0)
+  ...FR_MAP, // the map's words (1.5.0)
 };

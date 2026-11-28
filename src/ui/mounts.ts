@@ -45,7 +45,7 @@ export function mountsTab(panel: HTMLElement, g: Game, redraw: () => void): void
     const selected = g.player.mount.selected === id;
     const has = owned(g, id);
     const why = !unlocked ? t('mounts.whyQuest') : t(importDlc ? 'mounts.whyItchDlc' : 'mounts.whyDlc');
-    const b = option(panel, MOUNTS[id].name, () => {
+    const b = option(panel, t(`mounts.name.${id}`), () => {
       if (selectMount(g, id)) { saveNow(); redraw(); }
     }, mountAvailable(g, id), why, NOTES[id]());
     if (id === FREE_MOUNT || has) chips(b, [{ text: id === FREE_MOUNT ? t('mounts.included') : t('mounts.optional'), tone: 'dim' }]);

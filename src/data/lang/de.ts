@@ -2,6 +2,7 @@
 
 import type { Key } from './en';
 import { DE_PAGES } from './pages/de';
+import { DE_MAP } from './map/de';
 import { DE_SCREENS } from './screens/de';
 
 export const DE: Readonly<Record<Key, string>> = {
@@ -447,4 +448,5 @@ export const DE: Readonly<Record<Key, string>> = {
   'tip.mount.call': "Den Wagen rufen",
   ...DE_PAGES, // (1.5.0)
   ...DE_SCREENS, // the Elder Sign's screens (1.5.0)
+  ...DE_MAP, // the map's words (1.5.0)
 };

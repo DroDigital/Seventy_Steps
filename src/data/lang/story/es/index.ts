@@ -1,6 +1,7 @@
 /** The story in Spanish (data/lang/story/index.ts): a table for every domain. */
 
 import type { StoryBook } from '..';
+import { ES_WAYS } from './ways';
 import { ES_ARMS } from './arms';
 import { ES_WARES } from './wares';
 import { ES_ACHIEVEMENTS } from './achievements';
@@ -47,4 +48,5 @@ export const ES_STORY: StoryBook = {
   achievements: ES_ACHIEVEMENTS,
   rooms: ES_ROOMS,
   credits: ES_CREDITS,
+  ways: ES_WAYS,
 };

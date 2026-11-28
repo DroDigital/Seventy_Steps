@@ -1,6 +1,7 @@
 /** The story in German (data/lang/story/index.ts): a table for every domain. */
 
 import type { StoryBook } from '..';
+import { DE_WAYS } from './ways';
 import { DE_ARMS } from './arms';
 import { DE_WARES } from './wares';
 import { DE_ACHIEVEMENTS } from './achievements';
@@ -47,4 +48,5 @@ export const DE_STORY: StoryBook = {
   achievements: DE_ACHIEVEMENTS,
   rooms: DE_ROOMS,
   credits: DE_CREDITS,
+  ways: DE_WAYS,
 };

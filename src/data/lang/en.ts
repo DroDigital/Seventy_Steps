@@ -6,6 +6,7 @@
  */
 
 import { EN_PAGES } from './pages/en';
+import { EN_MAP } from './map/en';
 import { EN_SCREENS } from './screens/en';
 
 export const EN = {
@@ -467,6 +468,7 @@ export const EN = {
   'tip.mount.call': "Call the chariot",
   ...EN_PAGES, // the pages' words (1.5.0)
   ...EN_SCREENS, // the Elder Sign's screens (1.5.0)
+  ...EN_MAP, // the map's words (1.5.0)
 } as const satisfies Record<string, string>;
 
 export type Key = keyof typeof EN;
