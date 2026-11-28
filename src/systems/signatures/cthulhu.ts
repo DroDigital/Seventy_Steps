@@ -80,7 +80,7 @@ export const CTHULHU_SIGNATURE: Signature = {
     if (ship === undefined || f.sig.sailing || f.sig.burst) return null;
     if (distXZ(g.ecs.c.transform.get(ship)!.pos, g.ecs.c.transform.get(g.player.id)!.pos) > CTHULHU.helm) return null;
     return {
-      label: "take the Alert's helm",
+      label: t('act.helm'),
       run() {
         f.sig.sailing = 1;
         startMove(g.ecs.c.actor.get(g.player.id)!, 'helm');

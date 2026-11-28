@@ -11,6 +11,7 @@
 
 import type { Entity } from '../core/ecs';
 import { yawOf } from '../core/geom';
+import { story } from '../core/i18n';
 import { EPITHETS } from '../data/bossCards';
 import { arrival, fall, scaleOf, WAKE, type Scene } from '../data/cutscenes';
 import { ENDING_SCENES } from '../data/cutscenesEndings';
@@ -67,7 +68,7 @@ export function createDirector(g: Game, cinema: Cinema, opens: (endingId: string
     const line = id ? bossLine(id, moment) : undefined;
     if (!line || !alive()) return;
     g.events.emit('Said', { speaker: line.speaker, text: line.text });
-    g.events.emit('Notice', { text: line.text.toUpperCase() });
+    g.events.emit('Notice', { text: story(line.text).toUpperCase() });
   };
   /** Whether a scene is worth playing about this horror: one seen and heard, that stands as itself in the fight. */
   const worth = (e: Entity): boolean => {
@@ -80,7 +81,8 @@ export function createDirector(g: Game, cinema: Cinema, opens: (endingId: string
     const seen = g.ecs.c.combatant.get(entity)?.showcase ? memory : g.overworld?.watched ?? memory;
     if (!f || !worth(entity) || seen.has(f.id) || cinema.active) return;
     seen.add(f.id);
-    void cinema.play(speaking(arrivalOf(f.id, name, EPITHETS[f.id]) ?? arrival(scaleOf(height(entity)), name, EPITHETS[f.id]), f.id, 'arrive'), { target: entity }); // the great horrors of the story each come their own way (round 34)
+    const [shown, epithet] = [story(name), EPITHETS[f.id] && story(EPITHETS[f.id])]; // the title in the language chosen (1.5.0)
+    void cinema.play(speaking(arrivalOf(f.id, shown, epithet) ?? arrival(scaleOf(height(entity)), shown, epithet), f.id, 'arrive'), { target: entity }); // the great horrors of the story each come their own way (round 34)
   });
   g.events.on('FirstSight', ({ entity }) => {
     if (!g.ecs.c.fight.has(entity) && !cinema.active) notice(rosterId(entity), 'arrive'); // the Voice in the Tomb has words, but no phase script to send BossEngaged

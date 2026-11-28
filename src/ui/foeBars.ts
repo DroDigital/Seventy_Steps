@@ -10,6 +10,7 @@
 
 import { Vector3, type Camera } from 'three';
 import type { Entity } from '../core/ecs';
+import { story } from '../core/i18n';
 import { FOE_BARS } from '../data/tuning';
 import { isAbsent, isConcealed, isUnseen, type Game } from '../systems/components';
 import { hasLineOfSight } from '../world/colliders';
@@ -86,7 +87,7 @@ export function createFoeBars(g: Game, parent: HTMLElement): FoeBars {
         v.set(top.x, top.y, top.z).project(camera);
         if (v.z >= 1 || Math.abs(v.x) > 1.1 || Math.abs(v.y) > 1.1) continue;
         if (!hasLineOfSight(g.world, { x: eye.x, y: eye.y, z: eye.z }, { x: top.x, y: top.y - 0.4, z: top.z })) continue;
-        const name = ally(id) ? `✦ ${c.combatant.get(id)!.name}` : c.combatant.get(id)!.name;
+        const name = ally(id) ? `✦ ${story(c.combatant.get(id)!.name)}` : story(c.combatant.get(id)!.name); // in the language chosen (1.5.0)
         names.set(id, name);
         want.push({ id, x: Math.round((((v.x + 1) / 2) * r.width) / k), y: Math.round((((1 - v.y) / 2) * r.height) / k) - 16, width: plateWidth(name), keep: id === g.lock.target }); // the layer is the picture's box
       }

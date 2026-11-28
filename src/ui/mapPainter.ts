@@ -6,6 +6,7 @@
  * North is up. It hands back the marks it drew, for the screen to pick among (round 60).
  */
 
+import { story } from '../core/i18n';
 import type { RegionDef } from '../data/regions';
 import type { Game } from '../systems/components';
 import { cellsOf } from '../systems/exploration';
@@ -210,7 +211,7 @@ export function createMapPainter(g: Game): MapPainter {
         for (const r of realm) {
           if (!ow.explored.get(r.id)?.some((v) => v > 0)) continue;
           const rc = regionRect(r);
-          regionNames.push({ text: r.name.toUpperCase(), x: sx((rc.x0 + rc.x1) / 2), y: sy(rc.z1) + 6, size: 12 * k, color: 'rgba(217,208,184,0.55)', gap: 0, centred: true });
+          regionNames.push({ text: story(r.name).toUpperCase(), x: sx((rc.x0 + rc.x1) / 2), y: sy(rc.z1) + 6, size: 12 * k, color: 'rgba(217,208,184,0.55)', gap: 0, centred: true });
         }
         drawLabels(ctx, [...regionNames, ...labels], marks.map((m) => ({ x: m.x, y: m.y, r: m.r * 1.2 })));
       }

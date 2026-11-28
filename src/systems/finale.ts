@@ -3,6 +3,7 @@
  * tall man attends him. The sign's rest is untouched (the key's reach stops short of the rise). Pure.
  */
 
+import { t } from '../core/i18n';
 import { yawOf } from '../core/geom';
 import { courtPlaces, KEY_REACH, MAN_REACH } from '../data/finale';
 import { worldLayout } from '../world/placements';
@@ -22,7 +23,7 @@ export function finaleAction(g: Game): FightAction | null {
   const near = (p: { x: number; z: number }, reach: number): boolean => Math.hypot(me.pos.x - p.x, me.pos.z - p.z) <= reach;
   if (near(at.key, KEY_REACH)) {
     return {
-      label: 'close your hand on the key',
+      label: t('act.key'),
       run() {
         me.yaw = me.prevYaw = yawOf(sign.x - me.pos.x, sign.z - me.pos.z);
         endGame(g, 'seal');
@@ -31,7 +32,7 @@ export function finaleAction(g: Game): FightAction | null {
   }
   if (near(at.man, MAN_REACH)) {
     return {
-      label: 'attend the tall man',
+      label: t('act.man'),
       run() {
         me.yaw = me.prevYaw = yawOf(at.man.x - me.pos.x, at.man.z - me.pos.z);
         endGame(g, 'herald');

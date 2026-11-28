@@ -9,6 +9,7 @@
  * count, so a replay sees the same ways. Pure: no Three.js.
  */
 
+import { t } from '../core/i18n';
 import type { V3 } from '../core/geom';
 import type { Hazard, Look } from '../data/arenaWays';
 import { REGIONS } from '../data/regions';
@@ -350,7 +351,7 @@ export function riteAction(g: Game): FightAction | null {
   if (!nearest) return null;
   const { run, light } = nearest;
   const look = run.plan.way.rite!.look;
-  return { label: look === 'glow' ? 'kindle the light' : `light the ${look}`, run: () => takeLight(g, run, light) };
+  return { label: look === 'glow' ? t('act.kindle') : t('act.light', { what: t(`lite.${look}`) }), run: () => takeLight(g, run, light) };
 }
 
 const lookOfGlow = (glow: 'magenta' | 'purple' | 'green'): Look => (glow === 'magenta' ? 'stain' : glow === 'purple' ? 'star' : 'void');

@@ -6,7 +6,7 @@
  * first letter; which realms have been met is kept in the save's `told` set under `seen:<id>`, a cosmetic key like the hints'.
  */
 
-import { t } from '../core/i18n';
+import { story, t } from '../core/i18n';
 import { epigraphKey } from '../data/regionEpigraphs';
 import { getRegion } from '../data/regions';
 import { CARD } from '../data/uiMood';
@@ -40,11 +40,11 @@ export function createRealmCards(g: Game, banner: Pick<Banner, 'show'>, held: ()
     if (waiting?.args[1] === 'realm' && args[1] === 'place' && !region) return; // (a realm's first card is not given up for a place's)
     waiting = { args, region, at: performance.now() };
   };
-  g.events.on('RegionEntered', (e) => queue(e.region, getRegion(e.region)?.name ?? e.name));
+  g.events.on('RegionEntered', (e) => queue(e.region, story(getRegion(e.region)?.name ?? e.name)));
   g.events.on('Travelled', (e) => {
     const there = signPlace(e.to)?.region ?? gatePlace(e.to)?.region;
     if (there && there !== g.overworld?.region) return; // another realm: its own card follows, the step after
-    queue(null, e.name);
+    queue(null, story(e.name));
   });
   return {
     update() {

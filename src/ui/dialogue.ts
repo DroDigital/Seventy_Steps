@@ -7,7 +7,7 @@
  */
 
 import { captionSize } from './captions';
-import { t } from '../core/i18n';
+import { story, t } from '../core/i18n';
 import { wordMoments } from '../core/pace';
 import { DOCUMENTS, documentSkin } from '../data/documents';
 import { paper } from './skins/paper';
@@ -43,7 +43,7 @@ export const notePaper: { screen: Screen | null } = { screen: null };
 const letterScreen = (): Screen => (notePaper.screen ??= createScreen(8, '#050506cc', undefined, true, false, paper));
 
 /** A note (a letter, a clipping, a report) on its burnt paper. `label` is its button: from the world it is put away; from the journal it goes back to the journal (which stays open beneath it). */
-export function showNote(name: string, label = `${glyph('interact')} · Put it away`): void {
+export function showNote(name: string, label = `${glyph('interact')} · ${t('talk.putAway')}`): void {
   const screen = letterScreen();
   screen.show(documentPage(name, () => screen.close(), label));
 }
@@ -98,17 +98,17 @@ export function createDialogue(g: Game): Dialogue {
     const say = (): void => {
       g.events.emit('Said', { speaker: `npc:${voice ?? npc}`, text: lines[i] });
       const text = lines[i];
-      timer = window.setTimeout(() => text === current && begin(wordMoments(words(text), null, 1, spokenFor(`npc:${voice ?? npc}`, text))), LATE); // no voice came: said by the clock
+      timer = window.setTimeout(() => text === current && begin(wordMoments(words(story(text)), null, 1, spokenFor(`npc:${voice ?? npc}`, text))), LATE); // no voice came: said by the clock (the words shown, in the language chosen; the voice is the English line's)
     };
     const page: Page = {
       back: leave,
       keys: (e) => void (advances(e.code) && !e.repeat && next()),
       build(p) {
-        el(p, 'div', name.toUpperCase(), `letter-spacing:3px;color:${BONE};${SHADOW}`);
-        el(p, 'div', title, `opacity:.55;font-size:11px;margin-bottom:8px;${SHADOW}`);
+        el(p, 'div', story(name).toUpperCase(), `letter-spacing:3px;color:${BONE};${SHADOW}`);
+        el(p, 'div', story(title), `opacity:.55;font-size:11px;margin-bottom:8px;${SHADOW}`);
         const para = el(p, 'div', '', `font-size:${captionSize(16)};line-height:1.55;min-height:3.1em;background:var(--caption-bg, transparent);padding:2px 6px;margin:0 -6px;border-radius:2px;${SHADOW}`);
         const shown = said;
-        spans = words(lines[i]).map((w, k) => {
+        spans = words(story(lines[i])).map((w, k) => {
           if (k) para.append(' ');
           const s = el(para, 'span', w, `${UNSAID};${k < shown ? SAID : ''}`);
           if (k < shown) s.style.transition = 'none'; // a page drawn again keeps what was said, still
@@ -117,7 +117,7 @@ export function createDialogue(g: Game): Dialogue {
         const last = i >= lines.length - 1;
         const row = el(p, 'div', '', 'display:flex;justify-content:space-between;align-items:center;margin-top:6px');
         el(row, 'div', `${i + 1} / ${lines.length}`, `opacity:.35;font-size:10px;${SHADOW}`);
-        button(row, `${glyph('interact')} · ${last ? (shop ? 'Trade' : 'Leave') : 'Go on'}`, next).className = 'quiet';
+        button(row, `${glyph('interact')} · ${last ? (shop ? t('talk.trade') : t('talk.leave')) : t('talk.goOn')}`, next).className = 'quiet';
       },
     };
     const next = (): void => {
@@ -137,10 +137,10 @@ export function createDialogue(g: Game): Dialogue {
         back: finish,
         keys: (e) => void (advances(e.code) && !e.repeat && finish()),
         build(p) {
-          el(p, 'div', 'A RUMOUR', 'letter-spacing:3px;margin-bottom:6px');
-          el(p, 'div', `From ${name}`, 'opacity:.55;font-size:11px;margin-bottom:14px');
-          el(p, 'p', rumor.text, `font-size:${captionSize(16)};line-height:1.6;margin:0 0 14px`);
-          button(p, `${glyph('interact')} · Put it away`, finish);
+          el(p, 'div', t('talk.rumour'), 'letter-spacing:3px;margin-bottom:6px');
+          el(p, 'div', t('talk.from', { name: story(name) }), 'opacity:.55;font-size:11px;margin-bottom:14px');
+          el(p, 'p', story(rumor.text), `font-size:${captionSize(16)};line-height:1.6;margin:0 0 14px`);
+          button(p, `${glyph('interact')} · ${t('talk.putAway')}`, finish);
         },
       });
       g.events.emit('RumorRead', { npc, boss: rumor.boss });
@@ -159,7 +159,7 @@ export function createDialogue(g: Game): Dialogue {
     if (!doc) return;
     g.sheltered = true; // at once, as for a talk: a page opened within a step holds the investigator safe for the rest of it
     if (documentSkin(doc) === 'paper') showNote(name);
-    else read.show(documentPage(name, () => read.close(), `${glyph('interact')} · Put it away`));
+    else read.show(documentPage(name, () => read.close(), `${glyph('interact')} · ${t('talk.putAway')}`));
   });
 
   return {
@@ -193,9 +193,9 @@ export function documentPage(name: string, back: () => void, label = t('keys.bac
       if (!e.repeat) back(); // a repeat is a key still held (one down from before the page opened repeats too): it closes nothing
     },
     build(p) {
-      el(p, 'div', name.toUpperCase(), `letter-spacing:3px;color:${BONE};margin-bottom:4px`);
-      el(p, 'div', doc?.kind === 'tome' ? 'a tome' : 'a note', 'opacity:.45;font-size:11px;margin-bottom:14px');
-      for (const para of doc?.text ?? []) el(p, 'p', para, 'font-size:15px;line-height:1.6;margin:0 0 10px');
+      el(p, 'div', story(name).toUpperCase(), `letter-spacing:3px;color:${BONE};margin-bottom:4px`);
+      el(p, 'div', doc?.kind === 'tome' ? t('read.tome') : t('read.note'), 'opacity:.45;font-size:11px;margin-bottom:14px');
+      for (const para of doc?.text ?? []) el(p, 'p', story(para), 'font-size:15px;line-height:1.6;margin:0 0 10px');
       button(p, label, back);
     },
   };

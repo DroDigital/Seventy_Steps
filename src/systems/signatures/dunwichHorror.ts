@@ -54,11 +54,11 @@ export const DUNWICH_SIGNATURE: Signature = {
   action(g, e, f) {
     const c = g.ecs.c;
     const player = c.actor.get(g.player.id)!;
-    if (lastPhase(f) && near(g, e, DUNWICH.chantRange)) return { label: 'chant the incantation', run: () => startMove(player, 'chant') };
+    if (lastPhase(f) && near(g, e, DUNWICH.chantRange)) return { label: t('act.chant'), run: () => startMove(player, 'chant') };
     if ((f.sig.powder ?? 0) <= 0 || !near(g, e, DUNWICH.reach)) return null;
     if ((c.unseen.get(e)?.revealed ?? 0) > DUNWICH.redust) return null; // still seen: E would only waste a dose
     return {
-      label: `scatter the Powder of Ibn Ghazi (${f.sig.powder})`,
+      label: t('act.powder', { n: f.sig.powder }),
       run() {
         f.sig.powder--;
         c.unseen.set(e, { revealed: DUNWICH.reveal });

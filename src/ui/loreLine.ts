@@ -3,7 +3,7 @@
  * told of it, else Lovecraft's; what has been said is kept in this browser with the hints (ui/hints.ts).
  */
 
-import { t } from '../core/i18n';
+import { story, t } from '../core/i18n';
 import { pickLore } from '../data/loreLines';
 import { epigraphKey } from '../data/regionEpigraphs';
 
@@ -27,7 +27,7 @@ export function nextLore(): string {
   } catch {
     // No storage: the lessons come round again.
   }
-  return line;
+  return story(line); // remembered by its English, shown in the language chosen (1.5.0)
 }
 
 const said = new Set<string>(); // the realms whose epigraph the veil has said this session: their title card does not say it again (ui/realmCards.ts)

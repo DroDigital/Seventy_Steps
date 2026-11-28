@@ -11,6 +11,7 @@
  * Pure: no Three.js.
  */
 
+import { t } from '../core/i18n';
 import type { Entity } from '../core/ecs';
 import type { XZ } from '../core/geom';
 import { yawOf } from '../core/geom';
@@ -55,7 +56,7 @@ function root(g: Game, e: Entity, p: XZ): Entity {
   c.health.set(r, { hp: SHUB.hp, max: SHUB.hp, immortal: false, calm: 0 });
   c.poise.set(r, { value: 1e4, max: 1e4, calm: 0 });
   c.actor.set(r, createActor(REACTIONS));
-  c.combatant.set(r, { name: 'Spawning Root', faction: 'enemy', bounty: 0 });
+  c.combatant.set(r, { name: t('foe.root'), faction: 'enemy', bounty: 0 });
   return r;
 }
 

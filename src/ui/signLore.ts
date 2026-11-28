@@ -5,6 +5,7 @@
  * offer never shuts a passage or puts an upgrade out of reach.
  */
 
+import { t } from '../core/i18n';
 import { LORE } from '../data/tuning';
 import type { Game } from '../systems/components';
 import { insightKept, loreWorth, offerInsight, surplusInsight } from '../systems/insight';
@@ -17,11 +18,11 @@ const BATCH = 5;
 export function loreSection(panel: HTMLElement, g: Game, redraw: () => void): void {
   const surplus = surplusInsight(g);
   if (surplus <= 0) {
-    if (g.mind.insight >= insightKept(g)) el(panel, 'div', `Insight beyond what the passages and the upgrades ask for can be offered here for ${LORE.echoes} Echoes a point.`, 'opacity:.45;font-style:italic;font-size:12px;line-height:1.5;padding:6px 14px 0');
+    if (g.mind.insight >= insightKept(g)) el(panel, 'div', t('lore.note', { n: LORE.echoes }), 'opacity:.45;font-style:italic;font-size:12px;line-height:1.5;padding:6px 14px 0');
     return;
   }
-  const hint = `Insight beyond what every hidden passage wants and every upgrade still to be bought would cost has no other use. Offered here it is worth ${LORE.echoes} Echoes a point; what is kept is not touched, so no passage shuts.`;
-  const all = button(panel, `Offer ${surplus} insight`, () => (offerInsight(g), redraw()), true, hint);
-  price(all, `+${loreWorth(surplus)} Echoes`);
-  if (surplus > BATCH) price(button(panel, `Offer ${BATCH} insight`, () => (offerInsight(g, BATCH), redraw()), true, hint), `+${loreWorth(BATCH)} Echoes`);
+  const hint = t('lore.hint', { n: LORE.echoes });
+  const all = button(panel, t('lore.offer', { n: surplus }), () => (offerInsight(g), redraw()), true, hint);
+  price(all, t('lore.worth', { n: loreWorth(surplus) }));
+  if (surplus > BATCH) price(button(panel, t('lore.offer', { n: BATCH }), () => (offerInsight(g, BATCH), redraw()), true, hint), t('lore.worth', { n: loreWorth(BATCH) }));
 }

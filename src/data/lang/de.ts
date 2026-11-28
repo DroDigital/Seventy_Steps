@@ -1,6 +1,9 @@
 /** Deutsch (core/i18n.ts). Alle Schlüssel des englischen Originals; die Erzählung und die Stimmen bleiben vorerst englisch. */
 
 import type { Key } from './en';
+import { DE_PAGES } from './pages/de';
+import { DE_MAP } from './map/de';
+import { DE_SCREENS } from './screens/de';
 
 export const DE: Readonly<Record<Key, string>> = {
   'keys.back': "Zurück",
@@ -34,6 +37,18 @@ export const DE: Readonly<Record<Key, string>> = {
   'title.anewNote': "Dies löscht den Traum auf Platz {slot}. Die Enden, die ihr erreicht habt, bleiben in Erinnerung.",
   'title.no': "Nein, zurück",
   'title.yes': "Ja, neu beginnen",
+  'intro.goOn': "weiter",
+  'intro.wake': "erwachen",
+  'intro.skip': "überspringen",
+  'hud.quoted': "„{text}“",
+  'talk.goOn': "Weiter",
+  'talk.leave': "Gehen",
+  'talk.trade': "Handeln",
+  'talk.rumour': "EIN GERÜCHT",
+  'talk.from': "Von {name}",
+  'talk.putAway': "Weglegen",
+  'read.tome': "ein Foliant",
+  'read.note': "eine Notiz",
   'pause.title': "PAUSE",
   'pause.resume': "Weiter",
   'pause.map': "Karte",
@@ -96,7 +111,7 @@ export const DE: Readonly<Record<Key, string>> = {
   'set.hint.shake': "Wie stark der Bildschirm bei einem Schlag oder Brüllen wackelt.",
   'set.hint.rumble': "Wie stark ein Controller bei einem Schlag, einem Schuss, einem Beben oder dem Herzschlag kurz vor dem Tod vibriert.",
   'set.hint.fxCap': "Begrenzt jeden Effekt eines schwindenden Geistes (Verzerrung, Flüstern, falsche Sterne), zur Schonung.",
-  'set.hint.camera': "Wie die Kamera hängt. Klassisch: wie zuvor. Heldenblick: tiefer und weiter, und im Fokus tritt sie zurück, um dich und den Gegner zusammen zu zeigen, bei einem großen weiter. Über der Schulter: dicht hinter deiner Schulter.",
+  'set.hint.camera': "Wie die Kamera hängt. Klassisch: wie zuvor. Heldenblick: tiefer und weiter, und im Fokus tritt sie zurück, um euch und den Gegner zusammen zu zeigen, bei einem großen weiter. Über der Schulter: dicht hinter eurer Schulter.",
   'set.hint.minimap': "Die Minikarte dreht sich mit der Ansicht, das Vorausliegende oben, oder behält Norden oben und dreht stattdessen euren Pfeil.",
   'set.hint.captions': "Die Größe der gesprochenen Worte: Zeilen in Zwischensequenzen, Gespräche, Mitgehörtes.",
   'set.hint.captionBack': "Ein dunkles Band hinter diesen Worten, um sie vor einem hellen Bild zu lesen.",
@@ -139,7 +154,7 @@ export const DE: Readonly<Record<Key, string>> = {
   'mounts.available': "Verfügbar",
   'mounts.whyQuest': "Beendet Die geliehenen Zügel, um ein Gefährt zu rufen.",
   'mounts.whyDlc': "Erfordert Besitz und Installation dieses optionalen DLC über Steam.",
-  'mounts.whyItchDlc': 'Wähle die Freischaltdatei für den Motorwagen aus deinem itch.io-Download.',
+  'mounts.whyItchDlc': 'Wählt die Freischaltdatei für den Motorwagen aus eurem itch.io-Download.',
   'mounts.importDlc': 'DLC importieren',
   'mounts.dlcInstalled': 'Motorwagen-DLC installiert.',
   'mounts.invalidDlc': 'Wähle die entpackte .seventysteps-dlc-Datei aus dem Motorwagen-Download.',
@@ -380,12 +395,12 @@ export const DE: Readonly<Record<Key, string>> = {
   'hint.riposte': "Ihr habt pariert: der Gegner ist offen. Schlagt sofort zu für einen kleinen Ripostenbonus. Auch ein schwerer Schlag genau in den Rücken eines Gegners erhält diesen Bonus.",
   'hint.fog': "Der Nebel voraus birgt einen Schrecken. {interact} geht hindurch, und wer einmal drin ist, kann nicht fort, bis einer von euch fällt. Ruht und werdet erst stärker, und entzündet die Kerze in seiner Nähe, wenn ihr wollt.",
   'hint.talk': "{interact} spricht mit den Menschen, denen ihr begegnet. Manche haben einen Auftrag, manche Waren, und alle wissen etwas.",
-  'hint.insight': "Einsicht ist, was der Geist gelernt hat. Sie öffnet Verborgenes, und sie wird ausgegeben: an einem Ältesten Zeichen kauft sie Resolve und Draught.",
+  'hint.insight': "Einsicht ist, was der Geist gelernt hat. Sie öffnet Verborgenes, und sie wird ausgegeben: an einem Ältesten Zeichen kauft sie Entschlossenheit und Schlucke.",
   'hint.passage': "Für einen Geist wie den euren war diese Wand keine Wand. Einsicht zeigt Türen und Brücken, die den Unwissenden verborgen bleiben; der leuchtende Rahmen ist eine. Geht hindurch: dahinter liegt etwas.",
   'hint.passageCost': "Verbrauchte Einsicht ist fort, und ein Durchgang, den sie offen hielt, wird wieder zur Wand. An einem Ältesten Zeichen nennt das Menü, was ein Kauf wieder verschlösse, bevor ihr zahlt.",
   'hint.lore': "Einsicht über das hinaus, was die verborgenen Durchgänge verlangen und die Aufwertungen des Geistes kosten, hat sonst keinen Nutzen. An einem Ältesten Zeichen, unter Level up, lässt sie sich gegen Echos anbieten.",
   'hint.gate': "Dieses Tor bleibt verschlossen, bis der Schrecken dahinter gefunden ist. {journal} zeigt, was verlangt wird, und die Karte führt dorthin: eine Seite zu lesen, eine Wache zur rechten Stunde, eine Gabe auf einem Altar. Tut, was verlangt wird, und das Tor öffnet sich, wenn ihr kommt.",
-  'hint.shortcut': "Eine von der anderen Seite verriegelte Tür ist ein Weg zurück. Nimm den langen Weg herum und hebe auf ihrer anderen Seite den Riegel ({interact}): Sie bleibt offen, und der Weg vom Älteren Zeichen ist beim nächsten Mal kurz.",
+  'hint.shortcut': "Eine von der anderen Seite verriegelte Tür ist ein Weg zurück. Nehmt den langen Weg herum und hebt auf ihrer anderen Seite den Riegel ({interact}): Sie bleibt offen, und der Weg vom Ältesten Zeichen ist beim nächsten Mal kurz.",
   'hint.relic': "Ein Relikt: eine Gabe mit einem Preis. Zwei werden zugleich getragen, die anderen aufbewahrt. Ruht an einem Ältesten Zeichen und öffnet dort den Reiter Relics.",
   'hint.transfer': "Eine spät gefundene Waffe kann die Verstärkung des Stockdegens übernehmen: an einem Ältesten Zeichen unter Arms, Move reinforcement. Nichts geht verloren, aber jede verschobene Stufe kostet Echos; Sternensteine, die in die Waffe selbst gesetzt werden, kosten keine.",
   'hint.gun': "{shoot} feuert den Revolver: sechs Patronen und die Reserve, die ihr tragt. {reload} lädt ihn. Er schlägt aus der Nähe hart zu und aus der Ferne wenig, und er verfehlt kleine Ziele auf Distanz. Patronen liegen in Kisten im Traum und werden von Händlern verkauft.",
@@ -431,4 +446,7 @@ export const DE: Readonly<Record<Key, string>> = {
   'tip.dodge.roll': "Unter einem Hieb hindurchrollen",
   'tip.heal.inject': "Wests Reagenz spritzen · schließt Wunden",
   'tip.mount.call': "Den Wagen rufen",
+  ...DE_PAGES, // (1.5.0)
+  ...DE_SCREENS, // the Elder Sign's screens (1.5.0)
+  ...DE_MAP, // the map's words (1.5.0)
 };

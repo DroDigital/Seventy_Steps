@@ -4,6 +4,7 @@
  * the menus say which passages a purchase would close before it is paid. Pure: the dungeons' data is read, nothing is changed.
  */
 
+import { story, t } from '../core/i18n';
 import { DUNGEONS } from '../data/dungeons';
 
 export interface Passage {
@@ -31,10 +32,10 @@ export const heldOpen = (insight: number, read?: ReadonlySet<string>): Passage[]
 export const closedBy = (insight: number, cost: number, read?: ReadonlySet<string>): Passage[] =>
   cost > insight ? [] : PASSAGES.filter((p) => p.need <= insight && p.need > insight - cost && unpassed(p, read));
 
-const named = (p: Passage): string => `${p.dungeon}: ${p.room}`;
+const named = (p: Passage): string => `${story(p.dungeon)}: ${p.room}`;
 
 /** A list of passages in words ("The Witch House: closet; University Library: restricted"); empty for none. */
 export function listed(ps: readonly Passage[], most = 2): string {
   const shown = ps.slice(0, most).map(named);
-  return ps.length > most ? `${shown.join('; ')}; and ${ps.length - most} more` : shown.join('; ');
+  return ps.length > most ? shown.join('; ') + t('sign.more', { n: ps.length - most }) : shown.join('; ');
 }

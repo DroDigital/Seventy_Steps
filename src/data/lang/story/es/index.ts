@@ -1,0 +1,52 @@
+/** The story in Spanish (data/lang/story/index.ts): a table for every domain. */
+
+import type { StoryBook } from '..';
+import { ES_WAYS } from './ways';
+import { ES_ARMS } from './arms';
+import { ES_WARES } from './wares';
+import { ES_ACHIEVEMENTS } from './achievements';
+import { ES_ROOMS } from './rooms';
+import { ES_CREDITS } from './credits';
+import { ES_BLOWS } from './blows';
+import { ES_BLOWSMORE } from './blowsMore';
+import { ES_CREATURES } from './creatures';
+import { ES_CREATURESLAST } from './creaturesLast';
+import { ES_CREATURESMORE } from './creaturesMore';
+import { ES_DEATHS } from './deaths';
+import { ES_DOCUMENTS } from './documents';
+import { ES_DOCUMENTSMORE } from './documentsMore';
+import { ES_FATES } from './fates';
+import { ES_INTRO } from './intro';
+import { ES_LORE } from './lore';
+import { ES_OVERHEARD } from './overheard';
+import { ES_PEOPLE } from './people';
+import { ES_PLACES } from './places';
+import { ES_PLACESFAR } from './placesFar';
+import { ES_POIS } from './pois';
+import { ES_POISMORE } from './poisMore';
+import { ES_QUESTS } from './quests';
+import { ES_RUMORS } from './rumors';
+import { ES_SCENES } from './scenes';
+
+export const ES_STORY: StoryBook = {
+  intro: ES_INTRO,
+  people: ES_PEOPLE,
+  rumors: ES_RUMORS,
+  overheard: ES_OVERHEARD,
+  fates: ES_FATES,
+  quests: ES_QUESTS,
+  documents: { ...ES_DOCUMENTS, ...ES_DOCUMENTSMORE },
+  places: { ...ES_PLACES, ...ES_PLACESFAR },
+  creatures: { ...ES_CREATURES, ...ES_CREATURESMORE, ...ES_CREATURESLAST },
+  pois: { ...ES_POIS, ...ES_POISMORE },
+  deaths: ES_DEATHS,
+  blows: { ...ES_BLOWS, ...ES_BLOWSMORE },
+  lore: ES_LORE,
+  scenes: ES_SCENES,
+  arms: ES_ARMS,
+  wares: ES_WARES,
+  achievements: ES_ACHIEVEMENTS,
+  rooms: ES_ROOMS,
+  credits: ES_CREDITS,
+  ways: ES_WAYS,
+};

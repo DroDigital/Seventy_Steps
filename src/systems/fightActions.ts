@@ -5,6 +5,7 @@
  * Only a free investigator acts. Pure: no Three.js.
  */
 
+import { t } from '../core/i18n';
 import { distXZ } from '../core/geom';
 import type { InputFrame } from '../core/input';
 import { REALITY } from '../data/tuning';
@@ -30,7 +31,7 @@ export function fightAction(g: Game): FightAction | null {
       const lamp = c.prop.get(l)!;
       if (lamp.lit || distXZ(c.transform.get(l)!.pos, pp) > REALITY.lampReach) continue;
       return {
-        label: 'relight the lamp',
+        label: t('act.relight'),
         run() {
           lamp.lit = true;
           startMove(a, 'kindle');

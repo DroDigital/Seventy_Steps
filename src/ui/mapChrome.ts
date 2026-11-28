@@ -7,25 +7,39 @@
  * while the pointer is over it.
  */
 
+import { t } from '../core/i18n';
 import { canvasSerif, SERIF } from './hudKit';
 import { BONE, DIM, drawMark, type MarkKind, type MarkState } from './mapIcons';
 import type { Mark } from './mapMarks';
 import { el } from './menuKit';
 
 /** The key's rows: a figure and its name (the second line, dim, says what to do with it, on a card while the pointer is on the row). Read down the first column, then the second. */
-export const KEY_ROWS: readonly { kind: MarkKind; state?: MarkState; words: string; hint?: string }[] = [
-  { kind: 'you', words: 'You' },
-  { kind: 'sign', state: { lit: true }, words: 'Elder Sign', hint: 'rest here; click it to travel, from any realm the map shows' },
-  { kind: 'sign', words: 'Unlit sign', hint: 'walk up to it to light it' },
-  { kind: 'gate', words: 'Gate', hint: 'walk through it' },
-  { kind: 'dungeon', words: 'Dungeon' },
-  { kind: 'boss', words: "Horror's lair", hint: 'a closed eye: slain' },
-  { kind: 'person', state: { met: true }, words: 'Someone met' },
-  { kind: 'echo', words: 'Lost Echoes', hint: 'walk over them' },
-  { kind: 'secret', state: { rumour: true }, words: 'Something strange', hint: 'near ground you have charted' },
-  { kind: 'secret', state: { poi: 'tale' }, words: 'Secret found', hint: 'ring, square, triangle, star or cross: a tale, a hoard, a rite, an anomaly or a den' },
-  { kind: 'lead', state: { now: 0 }, words: 'Story leads here', hint: 'an arrow at the edge points to it' },
-  { kind: 'marker', words: 'Your markers', hint: 'right-click, F or Y sets one, or removes the one it is on; the minimap points to each' },
+type MapWord = Parameters<typeof t>[0];
+/** A row whose words are read in the language chosen each time they are drawn (1.5.0). */
+const row = (kind: MarkKind, words: MapWord, hint?: MapWord, state?: MarkState): { kind: MarkKind; state?: MarkState; readonly words: string; readonly hint?: string } => ({
+  kind,
+  ...(state && { state }),
+  get words() {
+    return t(words);
+  },
+  get hint() {
+    return hint && t(hint);
+  },
+});
+
+export const KEY_ROWS: readonly { kind: MarkKind; state?: MarkState; readonly words: string; readonly hint?: string }[] = [
+  row('you', 'mapkey.you'),
+  row('sign', 'mapkey.sign', 'mapkey.signHint', { lit: true }),
+  row('sign', 'mapkey.unlit', 'mapkey.unlitHint'),
+  row('gate', 'mapkey.gate', 'mapkey.gateHint'),
+  row('dungeon', 'mapkey.dungeon'),
+  row('boss', 'mapkey.boss', 'mapkey.bossHint'),
+  row('person', 'mapkey.person', undefined, { met: true }),
+  row('echo', 'mapkey.echo', 'mapkey.echoHint'),
+  row('secret', 'mapkey.strange', 'mapkey.strangeHint', { rumour: true }),
+  row('secret', 'mapkey.secret', 'mapkey.secretHint', { poi: 'tale' }),
+  row('lead', 'mapkey.lead', 'mapkey.leadHint', { now: 0 }),
+  row('marker', 'mapkey.marker', 'mapkey.markerHint'),
 ];
 
 const ICON = 24; // CSS pixels a key's figure is drawn in (at the UI's scale)
@@ -113,10 +127,10 @@ export function buildKey(panel: HTMLElement, startOpen: boolean, remember: (open
 
 /** What each key does, for the keyboard or for the pad: groups of keys and the words beside them. `realms`: more than one realm is known (mapRealms.ts), and a key turns between them. */
 export function hintsFor(pad: boolean, mapKey: string, realms = false): readonly (readonly [readonly string[], string])[] {
-  const turn: readonly (readonly [readonly string[], string])[] = realms ? [[pad ? ['L3'] : ['Q', 'E'], 'Realm']] : [];
+  const turn: readonly (readonly [readonly string[], string])[] = realms ? [[pad ? ['L3'] : ['Q', 'E'], t('maphint.realm')]] : [];
   return pad
-    ? [[['LT', 'RT'], 'Zoom'], [['Left stick'], 'Aim / switch'], [['Right stick'], 'Pan'], [['R3'], 'Lock a sign'], [['D-pad'], 'Pick a sign'], [['A'], 'Travel / find me'], [['LB', 'RB'], 'Next sign'], ...turn, [['Y'], 'Marker / remove'], [['X'], 'Key'], [['B'], 'Close']]
-    : [[['Wheel', '+', '−'], 'Zoom'], [['Drag', 'WASD'], 'Pan'], [['C'], 'Find me'], [['Click', 'Tab'], 'Pick a sign'], ...turn, [['Right-click', 'F'], 'Marker / remove'], [['Del'], 'Clear markers'], [['L'], 'Key'], [[mapKey], 'Close']];
+    ? [[['LT', 'RT'], t('maphint.zoom')], [[t('keyname.leftStick')], t('maphint.aim')], [[t('keyname.rightStick')], t('maphint.pan')], [['R3'], t('maphint.lock')], [[t('keyname.dpad')], t('maphint.pick')], [['A'], t('maphint.travel')], [['LB', 'RB'], t('maphint.next')], ...turn, [['Y'], t('maphint.marker')], [['X'], t('maphint.key')], [['B'], t('maphint.close')]]
+    : [[[t('keyname.wheel'), '+', '−'], t('maphint.zoom')], [[t('keyname.drag'), 'WASD'], t('maphint.pan')], [['C'], t('maphint.findMe')], [[t('keyname.click'), 'Tab'], t('maphint.pick')], ...turn, [[t('keyname.rightClick'), 'F'], t('maphint.marker')], [[t('keyname.del')], t('maphint.clear')], [['L'], t('maphint.key')], [[mapKey], t('maphint.close')]];
 }
 
 /** The row of keys along the bottom edge. */

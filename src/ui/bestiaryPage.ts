@@ -6,9 +6,10 @@
  */
 
 import { FIELD_NOTES } from '../data/bestiaryNotes';
-import { HABITS, TIER_NAMES, weaknessLine, wherever } from '../data/bestiaryFacts';
+import { HABITS, TIER_NAMES, tierKind, weaknessLine, wherever } from '../data/bestiaryFacts';
 import { ENTITIES } from '../data/registry';
 import { TIERS, type EntityDef } from '../data/schema';
+import { story, t } from '../core/i18n';
 import type { Game } from '../systems/components';
 import { button, el, footer, heading, title, type Page } from './menuKit';
 
@@ -19,13 +20,13 @@ function entryPage(e: EntityDef, back: () => void): Page {
   return {
     back,
     build(p) {
-      title(p, e.name.toUpperCase());
-      el(p, 'div', `${TIER_NAMES[e.tier].toLowerCase().replace(/^the /, '')} · from “${e.source}”`, 'opacity:.45;font-size:11px;letter-spacing:2px;text-align:center;margin:-6px 0 12px');
-      el(p, 'p', FIELD_NOTES[e.id] ?? '', 'font-size:15px;line-height:1.6;margin:0 0 10px');
-      el(p, 'p', HABITS[e.behavior.archetype], 'font-size:14px;line-height:1.5;margin:0 0 6px;opacity:.8');
+      title(p, story(e.name).toUpperCase());
+      el(p, 'div', t('beast.from', { kind: tierKind(e.tier), source: story(e.source) }), 'opacity:.45;font-size:11px;letter-spacing:2px;text-align:center;margin:-6px 0 12px');
+      el(p, 'p', story(FIELD_NOTES[e.id] ?? ''), 'font-size:15px;line-height:1.6;margin:0 0 10px');
+      el(p, 'p', t(HABITS[e.behavior.archetype]), 'font-size:14px;line-height:1.5;margin:0 0 6px;opacity:.8');
       const weak = weaknessLine(e);
       if (weak) el(p, 'p', weak, 'font-size:14px;line-height:1.5;margin:0 0 6px;opacity:.8');
-      el(p, 'p', `Met in: ${wherever(e)}.`, 'font-size:12px;line-height:1.5;margin:8px 0 4px;opacity:.5');
+      el(p, 'p', t('beast.metIn', { places: wherever(e) }), 'font-size:12px;line-height:1.5;margin:8px 0 4px;opacity:.5');
       footer(p, '', back);
     },
   };
@@ -36,14 +37,14 @@ export function bestiaryPage(g: Game, back: () => void, show: (p: Page) => void)
     back,
     build(p) {
       const seen = beheld(g);
-      title(p, 'BESTIARY');
-      el(p, 'div', `${seen.length} of ${ENTITIES.length} beheld`, 'opacity:.5;font-size:12px;letter-spacing:2px;padding:0 14px 4px');
-      if (!seen.length) el(p, 'div', 'Nothing yet. What the investigator sees, the investigator may write down.', 'opacity:.5;line-height:1.5;padding:0 14px');
+      title(p, t('beast.title'));
+      el(p, 'div', t('journal.beheld', { n: seen.length, of: ENTITIES.length }), 'opacity:.5;font-size:12px;letter-spacing:2px;padding:0 14px 4px');
+      if (!seen.length) el(p, 'div', t('beast.nothing'), 'opacity:.5;line-height:1.5;padding:0 14px');
       for (const tier of TIERS) {
         const list = seen.filter((e) => e.tier === tier);
         if (!list.length) continue;
-        heading(p, `${TIER_NAMES[tier]} · ${list.length}`).style.margin = '12px 14px 4px';
-        for (const e of list) button(p, e.name, () => show(entryPage(e, () => show(page))));
+        heading(p, `${t(TIER_NAMES[tier])} · ${list.length}`).style.margin = '12px 14px 4px';
+        for (const e of list) button(p, story(e.name), () => show(entryPage(e, () => show(page))));
       }
       footer(p, '', back);
     },

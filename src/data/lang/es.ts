@@ -1,6 +1,9 @@
 /** Español (core/i18n.ts). Todas las claves del original inglés; el relato y las voces siguen en inglés por ahora. */
 
 import type { Key } from './en';
+import { ES_PAGES } from './pages/es';
+import { ES_MAP } from './map/es';
+import { ES_SCREENS } from './screens/es';
 
 export const ES: Readonly<Record<Key, string>> = {
   'keys.back': "Volver",
@@ -34,6 +37,18 @@ export const ES: Readonly<Record<Key, string>> = {
   'title.anewNote': "Esto borra el sueño de la ranura {slot}. Los finales que has alcanzado se recuerdan.",
   'title.no': "No, volver",
   'title.yes': "Sí, empezar de nuevo",
+  'intro.goOn': "seguir",
+  'intro.wake': "despertar",
+  'intro.skip': "saltar",
+  'hud.quoted': "«{text}»",
+  'talk.goOn': "Seguir",
+  'talk.leave': "Marcharse",
+  'talk.trade': "Comerciar",
+  'talk.rumour': "UN RUMOR",
+  'talk.from': "De {name}",
+  'talk.putAway': "Guardarlo",
+  'read.tome': "un tomo",
+  'read.note': "una nota",
   'pause.title': "PAUSA",
   'pause.resume': "Reanudar",
   'pause.map': "Mapa",
@@ -380,7 +395,7 @@ export const ES: Readonly<Record<Key, string>> = {
   'hint.riposte': "Paraste el golpe: el enemigo está abierto. Golpea al instante para una pequeña bonificación de réplica. Un golpe fuerte justo en el centro de la espalda de un enemigo también recibe esta bonificación.",
   'hint.fog': "La niebla de delante guarda un horror. {interact} la atraviesa, y una vez dentro no hay salida hasta que uno de los dos caiga. Descansa y hazte más fuerte antes, y enciende la vela que hay cerca de ella, si quieres.",
   'hint.talk': "{interact} habla con la gente que encuentras. Algunos tienen una misión que dar, otros mercancía que vender, y todos saben algo.",
-  'hint.insight': "El discernimiento es lo que la mente ha aprendido. Abre lo oculto, y también se gasta: en un Signo Arcano compra Resolve y Draught.",
+  'hint.insight': "El discernimiento es lo que la mente ha aprendido. Abre lo oculto, y también se gasta: en un Signo Arcano compra Determinación y Tragos.",
   'hint.passage': "Para una mente como la tuya, ese muro no era un muro. El discernimiento muestra puertas y puentes que los ignorantes no ven; el marco luminoso es uno. Cruza: algo hay al otro lado.",
   'hint.passageCost': "El discernimiento gastado se pierde, y un paso que mantenía abierto vuelve a ser un muro. En un Signo Arcano, el menú dice qué cerraría una compra antes de pagar.",
   'hint.lore': "El discernimiento que excede lo que piden los pasos ocultos y lo que cuestan las mejoras de la mente no sirve para nada más. En un Signo Arcano, en Level up, puede ofrecerse a cambio de Ecos.",
@@ -431,4 +446,7 @@ export const ES: Readonly<Record<Key, string>> = {
   'tip.dodge.roll': "Rueda bajo un golpe",
   'tip.heal.inject': "Inyecta el Reactivo de West · cierra heridas",
   'tip.mount.call': "Llamar al carro",
+  ...ES_PAGES, // (1.5.0)
+  ...ES_SCREENS, // the Elder Sign's screens (1.5.0)
+  ...ES_MAP, // the map's words (1.5.0)
 };

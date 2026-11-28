@@ -13,7 +13,7 @@
 
 import { PAD_BUTTON } from '../core/padMap';
 import { activePad } from '../core/pads';
-import { t } from '../core/i18n';
+import { story, t } from '../core/i18n';
 import type { XZ } from '../core/geom';
 import type { RegionDef } from '../data/regions';
 import { MARKER } from '../data/tuning';
@@ -158,13 +158,13 @@ export function createMapScreen(g: Game, painter: MapPainter, resume: () => void
     if (!prompt) return;
     const again = deviceInUse() === 'pad' ? fill(t('map.press'), true) : t('map.clickAgain'); // the south face button as the pad in hand prints it (A, ✕ or B)
     prompt.style.display = p ? '' : 'none';
-    prompt.textContent = !p ? '' : bar ? `${p.name.toUpperCase()}  ·  ${barWord(bar)}` : t('map.travelTo', { name: p.name.toUpperCase(), again });
+    prompt.textContent = !p ? '' : bar ? `${story(p.name).toUpperCase()}  ·  ${barWord(bar)}` : t('map.travelTo', { name: story(p.name).toUpperCase(), again });
     prompt.style.color = bar ? '#d80073' : BONE;
   };
   const journey = (p: MapPlace | null): void => {
     if (!p || barOf(p)) return; // (refused before the map closes and any veil falls)
     close();
-    go(p.name.toUpperCase(), () => travel(g, p.id), undefined, p.region);
+    go(story(p.name).toUpperCase(), () => travel(g, p.id), undefined, p.region);
   };
   const cycle = (by: 1 | -1, from = chosen): void => {
     if (!lit.length) return;

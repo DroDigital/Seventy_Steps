@@ -8,6 +8,7 @@
 
 import { LANGS, type LangId } from '../data/lang';
 import type { Key } from '../data/lang/en';
+import { STORY } from '../data/lang/story';
 
 let current = 0;
 
@@ -31,4 +32,13 @@ export function detectLocale(preferred: readonly string[]): number {
 export function t(key: Key, vars?: Readonly<Record<string, string | number>>): string {
   const text = LANGS[current].table[key] ?? LANGS[0].table[key] ?? key;
   return vars ? text.replace(/\{(\w+)\}/g, (m, name: string) => (name in vars ? String(vars[name]) : m)) : text;
+}
+
+/**
+ * A line of the story (what a person says, a page, a place's or a creature's name, a scene's words) in the language chosen,
+ * found by its English: the English where the language has none (data/lang/story, 1.5.0). Only for what is shown: a spoken
+ * line's recording is found by its English words, so the English goes to the voice and this to the eye.
+ */
+export function story(text: string): string {
+  return current === 0 ? text : (STORY[LANGS[current].id]?.get(text) ?? text);
 }

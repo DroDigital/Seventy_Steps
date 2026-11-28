@@ -5,7 +5,7 @@
  * is left only by choosing. Without this screen the candle is where they rise (death.ts).
  */
 
-import { t } from '../core/i18n';
+import { story, t } from '../core/i18n';
 import { getEntity } from '../data/registry';
 import { signPlace } from '../systems/checkpoints';
 import type { Game } from '../systems/components';
@@ -24,8 +24,9 @@ export function createRiseMenu(g: Game): RiseMenu {
   g.player.ask = true;
   const choose = (where: 'candle' | 'sign'): void => (screen.close(true), riseAt(g, where));
   g.events.on('RiseChoice', ({ wall }) => {
-    const boss = gatePlan(worldLayout()).fogs.find((f) => f.id === wall)?.bosses.map((b) => getEntity(b)?.name).find(Boolean);
-    const sign = g.overworld ? signPlace(g.overworld.sign)?.name : undefined;
+    const bossName = gatePlan(worldLayout()).fogs.find((f) => f.id === wall)?.bosses.map((b) => getEntity(b)?.name).find(Boolean);
+    const signName = g.overworld ? signPlace(g.overworld.sign)?.name : undefined;
+    const [boss, sign] = [bossName && story(bossName), signName && story(signName)];
     const page: Page = {
       build(panel) {
         title(panel, t('rise.title'));

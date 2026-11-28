@@ -5,6 +5,10 @@
  * yet: it stays English in every language, and the voices are English (docs/LOCALIZATION.md).
  */
 
+import { EN_PAGES } from './pages/en';
+import { EN_MAP } from './map/en';
+import { EN_SCREENS } from './screens/en';
+
 export const EN = {
   // keys at the foot of a page
   'keys.back': 'Back',
@@ -39,6 +43,18 @@ export const EN = {
   'title.anewNote': 'This deletes the dream in slot {slot}. The endings you have reached are remembered.',
   'title.no': 'No, go back',
   'title.yes': 'Yes, begin anew',
+  'intro.goOn': 'go on',
+  'intro.wake': 'wake',
+  'intro.skip': 'skip',
+  'hud.quoted': '“{text}”',
+  'talk.goOn': 'Go on',
+  'talk.leave': 'Leave',
+  'talk.trade': 'Trade',
+  'talk.rumour': 'A RUMOUR',
+  'talk.from': 'From {name}',
+  'talk.putAway': 'Put it away',
+  'read.tome': 'a tome',
+  'read.note': 'a note',
   // the pause menu
   'pause.title': 'PAUSED',
   'pause.resume': 'Resume',
@@ -450,6 +466,9 @@ export const EN = {
   'tip.dodge.roll': "Roll through a blow",
   'tip.heal.inject': "Inject West’s Reagent · closes wounds",
   'tip.mount.call': "Call the chariot",
+  ...EN_PAGES, // the pages' words (1.5.0)
+  ...EN_SCREENS, // the Elder Sign's screens (1.5.0)
+  ...EN_MAP, // the map's words (1.5.0)
 } as const satisfies Record<string, string>;
 
 export type Key = keyof typeof EN;

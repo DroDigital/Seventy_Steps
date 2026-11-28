@@ -1,6 +1,9 @@
 /** Français (core/i18n.ts). Toutes les clés de l’original anglais ; le récit et les voix restent en anglais pour l’instant. */
 
 import type { Key } from './en';
+import { FR_PAGES } from './pages/fr';
+import { FR_MAP } from './map/fr';
+import { FR_SCREENS } from './screens/fr';
 
 export const FR: Readonly<Record<Key, string>> = {
   'keys.back': "Retour",
@@ -34,6 +37,18 @@ export const FR: Readonly<Record<Key, string>> = {
   'title.anewNote': "Cela efface le rêve de l’emplacement {slot}. Les fins que vous avez atteintes sont conservées.",
   'title.no': "Non, revenir",
   'title.yes': "Oui, recommencer",
+  'intro.goOn': "continuer",
+  'intro.wake': "s’éveiller",
+  'intro.skip': "passer",
+  'hud.quoted': "« {text} »",
+  'talk.goOn': "Continuer",
+  'talk.leave': "Partir",
+  'talk.trade': "Commercer",
+  'talk.rumour': "UNE RUMEUR",
+  'talk.from': "De la part de {name}",
+  'talk.putAway': "Ranger",
+  'read.tome': "un grimoire",
+  'read.note': "une note",
   'pause.title': "PAUSE",
   'pause.resume': "Reprendre",
   'pause.map': "Carte",
@@ -380,12 +395,12 @@ export const FR: Readonly<Record<Key, string>> = {
   'hint.riposte': "Vous avez paré : l’ennemi est ouvert. Frappez aussitôt pour un léger bonus de riposte. Un coup lourd porté bien au centre du dos d’un ennemi donne aussi ce bonus.",
   'hint.fog': "La brume devant vous cache une horreur. {interact} la traverse, et une fois dedans, on ne sort plus avant que l’un de vous tombe. Reposez-vous et devenez plus fort d’abord, et allumez la bougie près d’elle, si vous le voulez.",
   'hint.talk': "{interact} parle aux gens que vous croisez. Certains ont une quête à confier, d’autres des marchandises à vendre, et tous savent quelque chose.",
-  'hint.insight': "Le discernement est ce que l’esprit a appris. Il ouvre ce qui est caché, et il se dépense : à un Signe des Anciens, il achète Resolve et Draught.",
+  'hint.insight': "Le discernement est ce que l’esprit a appris. Il ouvre ce qui est caché, et il se dépense : à un Signe des Anciens, il achète Résolution et Gorgées.",
   'hint.passage': "Pour un esprit comme le vôtre, ce mur n’en était pas un. Le discernement montre des portes et des ponts que les ignorants ne voient pas ; le cadre lumineux en est un. Passez : quelque chose se trouve au-delà.",
   'hint.passageCost': "Le discernement dépensé est perdu, et un passage qu’il tenait ouvert redevient un mur. À un Signe des Anciens, le menu dit ce qu’un achat refermerait avant que vous payiez.",
   'hint.lore': "Le discernement au-delà de ce que demandent les passages cachés et de ce que coûtent les améliorations de l’esprit ne sert à rien d’autre. À un Signe des Anciens, sous Level up, on peut l’offrir contre des Échos.",
   'hint.gate': "Cette porte reste close tant que l’horreur qu’elle garde n’a pas été trouvée. {journal} montre ce qui est demandé et la carte y mène : une page à lire, une veille tenue à la bonne heure, une offrande déposée sur un autel. Faites ce qui est demandé, et la porte s’ouvre à votre approche.",
-  'hint.shortcut': "Une porte barrée de l’autre côté est un chemin de retour. Fais le long détour et, de l’autre côté, lève la barre ({interact}) : elle reste ouverte, et le chemin depuis le Signe des Anciens sera court la prochaine fois.",
+  'hint.shortcut': "Une porte barrée de l’autre côté est un chemin de retour. Faites le long détour et, de l’autre côté, levez la barre ({interact}) : elle reste ouverte, et le chemin depuis le Signe des Anciens sera court la prochaine fois.",
   'hint.relic': "Une relique : un don qui a un prix. On en porte deux à la fois ; les autres sont gardées. Reposez-vous à un Signe des Anciens et ouvrez-y l’onglet Relics.",
   'hint.transfer': "Une arme trouvée tard peut prendre le renfort de la canne-épée : à un Signe des Anciens, dans Arms, Move reinforcement. Rien n’est perdu, mais chaque niveau déplacé coûte des Échos ; les pierres stellaires serties dans l’arme elle-même n’en coûtent aucun.",
   'hint.gun': "{shoot} tire au revolver : six balles, et celles de réserve que vous portez. {reload} le recharge. Il frappe fort de près et peu de loin, et manque les petites cibles à distance. Des balles gisent dans des caisses à travers le rêve et sont vendues par des marchands.",
@@ -431,4 +446,7 @@ export const FR: Readonly<Record<Key, string>> = {
   'tip.dodge.roll': "Rouler sous un coup",
   'tip.heal.inject': "Injecter le Réactif de West · ferme les plaies",
   'tip.mount.call': "Appeler le char",
+  ...FR_PAGES, // (1.5.0)
+  ...FR_SCREENS, // the Elder Sign's screens (1.5.0)
+  ...FR_MAP, // the map's words (1.5.0)
 };

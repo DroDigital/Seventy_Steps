@@ -15,55 +15,55 @@ import { bestiaryPage, beheld } from './bestiaryPage';
 import { documentPage, showNote } from './dialogue';
 import { fieldGuideBody } from './fieldGuide';
 import { keyLayout } from '../core/bindings';
-import { t } from '../core/i18n';
+import { story, t } from '../core/i18n';
 import { BONE } from './hudKit';
 import { actionButton, button, el, footer, heading, tabs, title, type Page } from './menuKit';
 
-const TABS = ['Under way', 'Documents', 'Field Guide', 'Bestiary'];
+const TABS = (): string[] => [t('journal.tab.quests'), t('journal.tab.docs'), t('journal.tab.guide'), t('journal.tab.bestiary')];
 
 export function journalPage(g: Game, back: () => void, show: (p: Page) => void, at = 0): Page {
   const page: Page = { back, build() {}, get backKeys() { return [keyLayout.journal]; } }; // its own key closes it, as the map's does
   const open = (i: number): void => show(journalPage(g, back, show, i));
   page.build = (p) => {
     p.dataset.body = '300'; // one height for the four tabs
-    title(p, 'JOURNAL');
-    tabs(p, TABS, at, open, page);
+    title(p, t('journal.title'));
+    tabs(p, TABS(), at, open, page);
     const body = el(p, 'div');
     if (at === 0) {
       const begun = Object.keys(QUESTS).filter((id) => stageOf(g, id) !== UNSTARTED);
       const now = begun.filter((id) => !isDone(g, id)).sort((a, b) => Number(!!QUESTS[b].main) - Number(!!QUESTS[a].main));
       const done = begun.filter((id) => isDone(g, id));
-      if (!now.length) el(body, 'div', mainLead(g)?.text ?? 'Nothing yet. Talk to the people you meet.', 'opacity:.65;line-height:1.5;padding:4px 14px');
+      if (!now.length) el(body, 'div', mainLead(g)?.text ?? t('journal.nothing'), 'opacity:.65;line-height:1.5;padding:4px 14px');
       const followed = g.overworld?.tracked;
       for (const id of now) {
         const q = QUESTS[id];
-        el(body, 'div', `${q.main ? '◆ ' : followed === id ? '◇ ' : ''}${q.title}`, `color:${BONE};margin-top:8px;padding:0 14px`);
-        el(body, 'div', q.stages[stageOf(g, id)].note, 'opacity:.7;line-height:1.5;padding:0 14px;font-size:14px');
+        el(body, 'div', `${q.main ? '◆ ' : followed === id ? '◇ ' : ''}${story(q.title)}`, `color:${BONE};margin-top:8px;padding:0 14px`);
+        el(body, 'div', story(q.stages[stageOf(g, id)].note), 'opacity:.7;line-height:1.5;padding:0 14px;font-size:14px');
         if (canTrack(g, id)) {
-          const trackBtn = actionButton(body, followed === id ? 'Following on map' : 'Follow on the map', followed === id ? '◇ Stop' : '◇ Pin  ›', () => (track(g, id), show(journalPage(g, back, show, 0))), followed === id ? 'The minimap and the map lead to the story again.' : 'The ◇ on the minimap and the map leads to this, in place of the story.');
+          const trackBtn = actionButton(body, followed === id ? t('journal.following') : t('journal.follow'), followed === id ? t('journal.stop') : t('journal.pin'), () => (track(g, id), show(journalPage(g, back, show, 0))), followed === id ? t('journal.storyAgain') : t('journal.leadsHere'));
           trackBtn.style.margin = '6px 14px 4px';
           trackBtn.style.width = 'calc(100% - 28px)';
         }
       }
       if (done.length) {
-        heading(body, `DONE · ${done.length}`).style.margin = '18px 14px 4px';
-        for (const id of done) el(body, 'div', `${QUESTS[id].title}. ${QUESTS[id].done}`, 'opacity:.55;line-height:1.5;margin:4px 14px 0;font-size:13px');
+        heading(body, t('journal.done', { n: done.length })).style.margin = '18px 14px 4px';
+        for (const id of done) el(body, 'div', t('journal.doneLine', { title: story(QUESTS[id].title), done: story(QUESTS[id].done) }), 'opacity:.55;line-height:1.5;margin:4px 14px 0;font-size:13px');
       }
     } else if (at === 1) {
       const read = [...(g.overworld?.read ?? [])].filter((n) => DOCUMENTS[n]);
-      el(body, 'div', `${read.length} of ${Object.keys(DOCUMENTS).length} found and read`, 'opacity:.45;font-size:12px;letter-spacing:2px;padding:0 14px 6px');
-      if (!read.length) el(body, 'div', 'Tomes, notes and letters are kept here once read.', 'opacity:.6;padding:0 14px');
-      for (const [kind, head] of [['tome', 'TOMES'], ['note', 'NOTES AND LETTERS']] as const) {
+      el(body, 'div', t('journal.read', { n: read.length, of: Object.keys(DOCUMENTS).length }), 'opacity:.45;font-size:12px;letter-spacing:2px;padding:0 14px 6px');
+      if (!read.length) el(body, 'div', t('journal.noDocs'), 'opacity:.6;padding:0 14px');
+      for (const [kind, head] of [['tome', 'journal.tomes'], ['note', 'journal.notes']] as const) {
         const some = read.filter((n) => DOCUMENTS[n].kind === kind);
         if (!some.length) continue;
-        heading(body, `${head} · ${some.length}`).style.margin = '12px 14px 4px';
-        for (const name of some) button(body, name, () => (documentSkin(DOCUMENTS[name]) === 'paper' ? showNote(name, t('keys.back')) : show(documentPage(name, () => show(page)))));
+        heading(body, t(head, { n: some.length })).style.margin = '12px 14px 4px';
+        for (const name of some) button(body, story(name), () => (documentSkin(DOCUMENTS[name]) === 'paper' ? showNote(name, t('keys.back')) : show(documentPage(name, () => show(page)))));
       }
     } else if (at === 2) {
       fieldGuideBody(body, g, show, page);
     } else {
-      el(body, 'div', `${beheld(g).length} of ${ENTITIES.length} beheld`, 'opacity:.45;font-size:12px;letter-spacing:2px;padding:0 14px 6px');
-      button(body, 'The creatures beheld', () => show(bestiaryPage(g, () => show(page), show)), true, 'Each creature met: a field note, its habits, its weakness, and where it is found.');
+      el(body, 'div', t('journal.beheld', { n: beheld(g).length, of: ENTITIES.length }), 'opacity:.45;font-size:12px;letter-spacing:2px;padding:0 14px 6px');
+      button(body, t('journal.creatures'), () => show(bestiaryPage(g, () => show(page), show)), true, t('journal.creaturesNote'));
     }
     footer(p, '', back);
   };

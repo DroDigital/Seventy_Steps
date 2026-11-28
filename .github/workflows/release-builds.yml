@@ -5,7 +5,8 @@ name: Release builds
 # Runs when the shell, packaging, or first-launch title flow changes, by hand, and on a tag (v*). The depots are the artifacts; uploading them is docs/RELEASE.md.
 # By hand with "itch" ticked it packs for itch.io instead (Steam off in the build) and pushes each platform with butler: it needs the
 # BUTLER_API_KEY secret (without it, only what would be sent is shown); with "demo" ticked too it packs the demo and pushes it to the
-# windows-demo, osx-demo and linux-demo channels (round 56: tools/itch_push.mjs). A Mac signed with a Developer ID, and notarised, needs the
+# windows-demo, osx-demo and linux-demo channels (round 56: tools/itch_push.mjs). An itch_version is stamped into package.json before packing, so
+# the build calls itself what the page shows, and a full game pushed is tagged v<version> (the tag job; 1.5.0). A Mac signed with a Developer ID, and notarised, needs the
 # MAC_CERT_P12_BASE64, MAC_CERT_PASSWORD, APPLE_ID, APPLE_APP_SPECIFIC_PASSWORD and APPLE_TEAM_ID secrets (docs/RELEASE.md); without them the Mac is signed ad hoc.
 
 on:
@@ -36,7 +37,7 @@ on:
         description: 'The itch.io project: <user>/<URL name>'
         default: 'digitaldro/seventy-steps'
       itch_version:
-        description: "The version itch.io shows for these builds, e.g. 1.0.0-rc.2 (empty: package.json's)"
+        description: "The version itch.io shows for these builds, and that they call themselves, e.g. 1.5.1 (empty: package.json's)"
         default: ''
       demo:
         description: 'Pack the demo (the university and Arkham only); with itch, push it to the -demo channels'
@@ -61,6 +62,12 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci
+      - name: The build carries the version itch.io shows (its crash reports, its saves, the exe's own)
+        if: ${{ inputs.itch_version != '' }}
+        shell: bash
+        env:
+          ITCH_VERSION: ${{ inputs.itch_version }}
+        run: npm version "$(echo "$ITCH_VERSION" | xargs)" --no-git-tag-version --allow-same-version
       - run: npm run ${{ inputs.demo && 'package:demo:win' || 'package:win' }} -- ${{ inputs.itch && '-c.extraMetadata.channel=itch' || '' }}
         shell: bash
       - name: Starts, and reaches its title
@@ -113,6 +120,11 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci
+      - name: The build carries the version itch.io shows (its crash reports, its saves, the app's own)
+        if: ${{ inputs.itch_version != '' }}
+        env:
+          ITCH_VERSION: ${{ inputs.itch_version }}
+        run: npm version "$(echo "$ITCH_VERSION" | xargs)" --no-git-tag-version --allow-same-version
       - name: Import the Developer ID certificate (when its secrets are set)
         if: ${{ env.HAS_DEVELOPER_ID == 'true' }}
         env:
@@ -204,6 +216,11 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci
+      - name: The build carries the version itch.io shows (its crash reports, its saves, the binary's own)
+        if: ${{ inputs.itch_version != '' }}
+        env:
+          ITCH_VERSION: ${{ inputs.itch_version }}
+        run: npm version "$(echo "$ITCH_VERSION" | xargs)" --no-git-tag-version --allow-same-version
       - name: Verify stripped demo holds no full-game content
         if: ${{ inputs.demo }}
         run: npm run check:demo
@@ -229,3 +246,23 @@ jobs:
         run: |
           if [ -n "$BUTLER_API_KEY" ]; then node tools/itch_push.mjs --only linux --get-butler --run
           else echo "::warning::No BUTLER_API_KEY secret: nothing was sent to itch.io (the plan only)"; node tools/itch_push.mjs --only linux --get-butler; fi
+
+  tag: # the full game pushed to itch.io is tagged v<version> at the commit it was built from; a tag pushed with this token starts no run of its own
+    needs: [windows, mac, linux]
+    if: ${{ inputs.itch && !inputs.demo }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+      - name: Tag the commit with the version itch.io shows
+        env:
+          HAS_KEY: ${{ secrets.BUTLER_API_KEY != '' }}
+          ITCH_VERSION: ${{ inputs.itch_version }}
+        run: |
+          [ "$HAS_KEY" = 'true' ] || { echo "Nothing was sent to itch.io (no BUTLER_API_KEY), so nothing is tagged."; exit 0; }
+          V="$(echo "$ITCH_VERSION" | xargs)"; V="${V:-$(node -p "require('./package.json').version")}"
+          if [ -n "$(git ls-remote --tags origin "refs/tags/v$V")" ]; then echo "::notice::v$V is already tagged: left as it is"; exit 0; fi
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' tag -a "v$V" -m "Seventy Steps $V, as pushed to itch.io" "$GITHUB_SHA"
+          git push origin "v$V"

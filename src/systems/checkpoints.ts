@@ -167,7 +167,7 @@ export function dream(g: Game): boolean {
   if (!g.overworld || !at || !signPlace(g.overworld.sign)?.dream || !descentOpen(g)) return false;
   if (!demoAllows(g, at)) return !demoRefuses(g); // the stair leads into the full game
   teleport(g, at);
-  g.events.emit('Travelled', { via: 'dream', to: 'slumber', name: __DEMO__ ? "the Sleeper's Stair" : 'Stairs of Slumber' });
+  g.events.emit('Travelled', { via: 'dream', to: 'slumber', name: __DEMO__ ? t('travel.sleepersStair') : 'Stairs of Slumber' });
   return true;
 }
 
@@ -223,7 +223,7 @@ export function interactable(g: Game): Interactable | null {
   for (const s of w.signs) consider({ kind: 'sign', id: s.id, name: s.name }, s, WORLD.signReach);
   for (const [e, id] of g.ecs.c.npc) consider({ kind: 'npc', id, name: npcDef(id)?.name ?? id }, g.ecs.c.transform.get(e)!.pos, WORLD.reach);
   const fog = fogToPass(g); // a boss's fog, close by: E passes it (round 35)
-  if (fog && best === null) return { kind: 'fog', id: fog.id, name: 'the fog' };
+  if (fog && best === null) return { kind: 'fog', id: fog.id, name: t('hud.theFog') };
   return best;
 }
 
