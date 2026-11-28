@@ -146,7 +146,7 @@ export const DEEP_DUNGEONS: readonly DungeonDef[] = [
       room('leng', 'hall', 'leng_climb', 'n', { wide: true, boss: ['high_priest'], spawns: ['man_of_leng'] }),
       room('monastery', 'corridor', 'leng', 'n', { spawns: ['man_of_leng', 'man_of_leng'] }),
       room('zin_steps', 'stair', 'leng', 'e', { rise: -5, spawns: ['gug', 'ghast'] }),
-      room('zin', 'pit', 'zin_steps', 'e', { sign: { id: 'dream_zin', name: 'Vaults of Zin' }, ally: 'pickman' }),
+      room('zin', 'hall', 'zin_steps', 'e', { sign: { id: 'dream_zin', name: 'Vaults of Zin', rest: [0, -6.25] }, ally: 'pickman' }),
       room('gug_city', 'hall', 'zin', 's', { spawns: ['gug', 'ghast', 'ghast'], words: 'THE CITY OF THE GUGS' }),
       stair('koth', 'gug_city', 's', 5, { spawns: ['ghast'], words: 'THE TOWER OF KOTH' }),
       room('koth_top', 'corridor', 'koth', 's', { spawns: ['zoog', 'zoog', 'ghoul'] }),

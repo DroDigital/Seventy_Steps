@@ -149,7 +149,6 @@ export const FR_SCREENS: Readonly<Record<ScreenKey, string>> = {
   'shop.noRoomChip': 'PLUS DE PLACE',
   'ach.title': 'SUCCÈS',
   'guide.note': 'Ce qu’on vous dit en chemin est gardé ici, pour être relu.',
-  'title.anyKey': 'appuyez sur une touche',
   'map.charted': '{n} % RELEVÉ',
   'map.place1': '1 LIEU RELEVÉ',
   'map.placesN': '{n} LIEUX RELEVÉS',

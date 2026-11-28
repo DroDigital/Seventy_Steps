@@ -89,6 +89,7 @@ export const rules: readonly PruneRule[] = [
   { file: 'src/data/propLooks.ts', decl: 'PROP_LOOKS', shape: 'properties', keep: regions },
   { file: 'src/data/foliage.ts', decl: 'CLIMATES', shape: 'properties', keep: regions }, // (round 116: how thick each realm grows)
   { file: 'src/data/dungeonLooks.ts', decl: 'DUNGEON_LOOKS', shape: 'properties', keep: dungeons },
+  { file: 'src/data/dungeonTraps.ts', decl: 'DUNGEON_TRAPS', shape: 'properties', keep: dungeons }, // (2026-11-27: each dungeon's traps and the shape of its pits)
   { file: 'src/data/dungeonLooks.ts', decl: 'KIT_PILLARS', shape: 'properties', keep: kept('kits') },
   { file: 'src/data/dungeonLooks.ts', decl: 'KIT_LOOKS', shape: 'properties', keep: kept('kits') }, // (round 122: the Stairs of Slumber's kits' own looks)
 ];

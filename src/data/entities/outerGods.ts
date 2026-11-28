@@ -30,7 +30,7 @@ export const OUTER_GODS = tier('outer_god', [
     id: 'other_gods', name: 'The Other Gods', source: 'The Other Gods', regions: ['cloud_summit'], canonLooks: false,
     sprite: { silhouette: 'spectre', palette: 'pallid', scale: 6, eyes: 0, tentacles: 4, glow: 'magenta' },
     ...scripted('brute', phases(ph(1, { othergods_smite: 2, othergods_scream: 1, othergods_eclipse: 1, othergods_tremor: 1 }), ph(0.5, { othergods_smite: 2, othergods_fall: 1, othergods_eclipse: 1, othergods_scream: 1, othergods_tremor: 1, othergods_spokes: 1 }, { hooks: ['darkness'] }))),
-    stats: st(5200, 800, 60, 2.6, 7, 16), drops: { echoes: 6000 }, insightOnSight: 4, // (round 97: health 3250 to 3700, its highest in the tables)
+    stats: st(4600, 800, 60, 2.6, 7, 16), drops: { echoes: 6000 }, insightOnSight: 4, // (round 97: health 3250 to 3700, its highest in the tables)
   },
   {
     id: 'yog_sothoth', name: 'Yog-Sothoth', source: 'The Dunwich Horror', regions: ['spheres'], canonLooks: true,

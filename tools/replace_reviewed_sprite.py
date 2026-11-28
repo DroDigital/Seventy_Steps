@@ -13,9 +13,9 @@ and, for a creature registered on the ground line, stand within GROUND pixels of
 registers by its central body, a flier or a levitating thing, is left to move). What the delivery brings is the creature's
 idle and move in all four views and its attack and hurt from the front (and a colossus's stoop, below): that is the whole of it.
 
-  * Attack and hurt are front art only. A left, right or back attack or hurt in a delivery is never packed, and the old drawing's
-    own (a boss's left and back combat) is dropped with it, for it would no longer match: seen from the side, a creature that
-    strikes or is struck shows its front (render/sprites/directional.ts).
+  * Attack and hurt default to front art only, dropping any older directional combat frames. A creature with
+    `"preserveDirectionalCombat": true` in its delivery MANIFEST.json entry must supply all existing left and back combat frames.
+    Those replace their original atlas slots, and the renderer still derives right combat from the mirrored left.
   * A scope may grow or shrink. A frame takes the old frame's place on its page where there was one; the rest take the places
     the old drawing freed on that page; the rest again go on a shelf at the foot of a library page with room (the creature's
     own first), and what nothing uses is cleared and taken out of the index (the frames after it move up a number).
@@ -47,7 +47,9 @@ LIMIT = 2048  # the most a page may be, either way
 GUTTER = 1
 GROUND = 2
 LIBRARY_PAGES = 4  # the library's own pages: the shelf of a redrawn creature is on one of them
-ACTIONS = ('idle', 'move', 'attack', 'hurt')
+IDLE_MOVE = ('idle', 'move')
+COMBAT = ('attack', 'hurt')
+ACTIONS = IDLE_MOVE + COMBAT
 STOOPS = ('stoop', 'stoop_mid')  # a colossus's bow and hold, and the pose halfway down to it: front only, in place on the pages of their own
 DIRECTIONS = ('front', 'back', 'left', 'right')
 
@@ -101,7 +103,7 @@ def load(path: Path):
     return rgba, data, rgba.getchannel('A').getbbox()
 
 
-def replace(pack: Pack, key: str, delivery: Path, central: bool) -> str:
+def replace(pack: Pack, key: str, delivery: Path, central: bool, preserve_directional_combat: bool = False) -> str:
     index, source = pack.index, pack.source
     entity = index['entities'][key]
     original = next(e for e in source['entities'] if e['key'] == key)
@@ -109,6 +111,13 @@ def replace(pack: Pack, key: str, delivery: Path, central: bool) -> str:
     idle = frames[entity['directions']['front']['actions']['idle'][0]]
     prefix = idle['source'].rsplit('/', 2)[0]  # sprites/<id>[/<variant>]/64x64, or bosses/<id>/movement
     canvas = (idle['width'], idle['height'])
+    views = entity['directions']
+    directional_combat = {
+        (direction, action): len(ids) for direction in ('left', 'back')
+        for action, ids in views[direction]['actions'].items() if action in COMBAT
+    } if preserve_directional_combat else {}
+    if any(views[direction]['sourceDirection'] != direction for direction, _ in directional_combat):
+        sys.exit(f'{key}: preserving directional combat requires its own left and back atlas slots')
 
     brought, skipped, stooped = {}, [], {}
     for path in sorted((delivery / prefix).glob('*/*.png')):
@@ -121,8 +130,8 @@ def replace(pack: Pack, key: str, delivery: Path, central: bool) -> str:
                 sys.exit(f'{path}: a stoop is front art')
             stooped.setdefault(action, {})[int(match.group(2))] = path
             continue
-        if direction != 'front' and action in ('attack', 'hurt'):
-            skipped.append(path)  # front art only: never packed
+        if direction != 'front' and action in COMBAT and (direction, action) not in directional_combat:
+            skipped.append(path)
             continue
         brought.setdefault((direction, action), {})[int(match.group(2))] = path
     if not brought:
@@ -130,8 +139,12 @@ def replace(pack: Pack, key: str, delivery: Path, central: bool) -> str:
     for (direction, action), by_n in brought.items():
         if sorted(by_n) != list(range(len(by_n))):
             sys.exit(f'{key} {direction}/{action}: frames are not numbered from 0 in a run')
+    for (direction, action), expected in directional_combat.items():
+        count = len(brought.get((direction, action), {}))
+        if count != expected:
+            sys.exit(f'{key} {direction}/{action}: expected {expected} replacement frames, got {count}')
     for direction in DIRECTIONS:
-        for action in ('idle', 'move'):
+        for action in IDLE_MOVE:
             if (direction, action) not in brought:
                 sys.exit(f'{key}: the delivery has no {direction}/{action}')
     for action in entity['directions']['front']['actions']:
@@ -151,7 +164,7 @@ def replace(pack: Pack, key: str, delivery: Path, central: bool) -> str:
     mirrored = all(
         sorted(brought[('left', a)]) == sorted(brought[('right', a)])
         and all(ImageOps.mirror(pixels[brought[('left', a)][n]][0]).tobytes() == pixels[brought[('right', a)][n]][0].tobytes() for n in brought[('left', a)])
-        for a in ('idle', 'move'))
+        for a in IDLE_MOVE)
     new = {}  # (direction, action, n) -> (path, rgba, bytes, bounds) of every frame drawn, a mirrored right not among them
     problems = []
     for (direction, action), by_n in sorted(brought.items()):
@@ -237,7 +250,7 @@ def replace(pack: Pack, key: str, delivery: Path, central: bool) -> str:
         drawn = not (d == 'right' and mirrored)
         src = d if drawn else 'left'
         actions, entries = {}, {}
-        for a in ACTIONS:
+        for a in IDLE_MOVE if d == 'right' else ACTIONS:
             if (src, a) not in brought:
                 continue
             ids = [slots[(src, a, n)] for n in range(len(brought[(src, a)]))]
@@ -286,12 +299,15 @@ def main(args: list, dry: bool) -> None:
     *keys, folder = args
     delivery = Path(folder)
     manifest = json.loads((delivery / 'MANIFEST.json').read_text()) if (delivery / 'MANIFEST.json').exists() else {'entities': []}
-    modes = {e['key']: 'central-body' in e.get('registrationMode', '') for e in manifest['entities']}
+    entries = {e['key']: e for e in manifest['entities']}
     if keys == ['--all']:
         keys = [e['key'] for e in manifest['entities']]
     pack = Pack(dry)
     for key in keys:
-        print(f'{key}: {replace(pack, key, delivery, modes.get(key, False))}', file=sys.stderr)
+        entry = entries.get(key, {})
+        note = replace(pack, key, delivery, 'central-body' in entry.get('registrationMode', ''),
+                       entry.get('preserveDirectionalCombat') is True)
+        print(f'{key}: {note}', file=sys.stderr)
     finish(pack)
     print(f'{len(keys)} creatures {"checked" if dry else "replaced"}; {len(pack.dead)} frames dropped; {len(pack.index["frames"])} frames in all; pages changed: '
           + ', '.join(f"{n} ({pack.page(n).width}x{pack.page(n).height})" for n in sorted(pack.touched)), file=sys.stderr)

@@ -158,7 +158,6 @@ export const EN_SCREENS = {
   'shop.noRoomChip': 'NO ROOM',
   'ach.title': 'ACHIEVEMENTS',
   'guide.note': 'What you are told as you go is kept here, to read again.',
-  'title.anyKey': 'press any key',
   'map.charted': '{n}% CHARTED',
   'map.place1': '1 PLACE CHARTED',
   'map.placesN': '{n} PLACES CHARTED',

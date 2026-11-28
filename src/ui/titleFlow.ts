@@ -6,7 +6,6 @@
  * when it can). The desktop menu opens independently of audio readiness. Also the one-time flag a reload carries (an ending's Begin anew).
  */
 
-import { t } from '../core/i18n';
 import { THEME, type DifficultyId } from '../data/tuning';
 import { playMenuMusic } from '../render/audio/music';
 import { activeSlot, useSlot } from '../systems/save';
@@ -15,6 +14,7 @@ import { makeAhead } from './loading';
 import { desktop } from './desktop';
 import type { Shell } from './shell';
 import { showTitle } from './titleScreen';
+import { t } from '../core/i18n';
 
 /** Shows the title; `start` makes the world once a choice is made (fresh: a new game, with its opening). */
 export function title(shell: Shell, start: (fresh: boolean, difficulty?: DifficultyId) => void): void {
@@ -24,7 +24,7 @@ export function title(shell: Shell, start: (fresh: boolean, difficulty?: Difficu
   let [opened, refused] = [false, false];
   void music.refused.then(() => {
     refused = true;
-    if (!opened && !desktop) shell.veil.darken(t('title.anyKey'));
+    if (!opened && !desktop) shell.veil.darken(t('title.press'), true); // the one call: inked out of the dark, then breathing
   });
   showTitle({
     slots: () => slotLines(shell.store),

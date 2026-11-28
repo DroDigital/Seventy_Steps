@@ -23,11 +23,13 @@ import { FEATURE_KINDS, FEATURE_RADIUS, featureProps, type Feature } from './fea
 import { worldLayout, type SpawnPoint } from './placements';
 import { planSpawns, settleSpawns } from './planSpawns';
 import { sealWings } from './sealWings';
+import { BUILT, clearHouses, propsMeet } from './footprints';
 import { planPois, type PoiSite } from './poiPlan';
 import { planTraderLamps } from './traderPlan';
 import type { TraderSpot } from '../data/traders';
 import { nearestRoad, placeFillers, roadside, scatterBiome } from './planFill';
-import { makeProp, worldColliders, type Prop } from './props';
+import { LAMP_APART, makeProp, worldColliders, type Prop } from './props';
+import { apartHouses, clearTrunks } from './tidyProps';
 import { padDistance } from './sitePads';
 import { addedFoes, applyProps, applySpawn } from './edits/editApply';
 import { borderPoints, planRoads, segmentDistance, type Road } from './roads';
@@ -175,7 +177,8 @@ function buildPlan(region: RegionDef): RegionPlan {
     }
   }
   for (const { x, z, town: t } of lamps) {
-    if (Math.hypot(x - t.x, z - t.z) < t.radius && occ.disk(x, z, 0.8, false) && offSites(x, z, 1) && roadClear(x, z, 0.3) && clearOfFronts(x, z)) put(makeProp('lamp', x, z, rng, 0), 0.8);
+    const apart = props.every((q) => q.kind !== 'lamp' || Math.hypot(q.x - x, q.z - z) >= LAMP_APART); // (no lamp a step from another, as at a crossing)
+    if (Math.hypot(x - t.x, z - t.z) < t.radius && apart && occ.disk(x, z, 0.8, false) && offSites(x, z, 1) && roadClear(x, z, 0.3) && clearOfFronts(x, z)) put(makeProp('lamp', x, z, rng, 0), 0.8);
   }
   // Field walls along the country roads, with gaps.
   if (layout.walls) {
@@ -206,6 +209,9 @@ function buildPlan(region: RegionDef): RegionPlan {
   props.push(...pois.props);
   spawns.push(...pois.spawns);
   sealWings(props); // (round 110: a house's wing that shuts a yard in is taken off its house, before the foes are settled about the walls that stand)
+  apartHouses(props); // (2026-11-27: no house's wing through its neighbour: tidyProps.ts)
+  clearHouses(props); // (2026-11-27: no tree or rock left standing in a house's walls or wing, the wings now known)
+  clearTrunks(props); // (2026-11-27: no trunk through a trunk, a headstone, a fence or a hedge)
   settleSpawns(region, props, spawns); // (round 110: a foe in a wall, a house's wing among them, is moved out, or left out where no place is near)
   const traders = planTraderLamps(region, props, roadClear, (x, z, m) => offSites(x, z, m), spawns); // and the trader's lamps, the very last (2026-11-06)
   const plan = bucket(layout, roads, features, ways, pois.sites, traders);
@@ -250,7 +256,8 @@ function planWays(region: RegionDef, props: Prop[], offSites: (x: number, z: num
     if (!way) continue;
     const plan = planWay(a, way);
     for (let i = props.length - 1; i >= 0; i--) if (clearsFor(plan, props[i])) props.splice(i, 1);
-    const marks = wayProps(plan);
+    const built = props.filter((p) => BUILT.has(p.kind));
+    const marks = wayProps(plan, (p) => built.some((q) => Math.hypot(q.x - p.x, q.z - p.z) < reach(p) + reach(q) + 1 && propsMeet(p, q, 0.5))); // (each row ended where it meets a house, a ruin, a wall or a fence: 2026-11-27)
     for (let i = marks.length - 1; i >= 0; i--) if (clearsRite(plan, marks[i]!)) marks.splice(i, 1); // off the way too: each rite's light, and the walk from the court to it
     for (const other of out) for (let i = marks.length - 1; i >= 0; i--) if (clearsFor(other, marks[i]!)) marks.splice(i, 1); // not across a court already laid
     for (let i = marks.length - 1; i >= 0; i--) if (!offSites(marks[i]!.x, marks[i]!.z)) marks.splice(i, 1); // nor on a sign's, a tome's or a door's ground, nor on a foe's post

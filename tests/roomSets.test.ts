@@ -31,14 +31,12 @@ describe("an ordinary room's set (round 79: the library's shelves, the stair's b
       const hearts = new Set(ROOM_SETS[key].puts.filter((u) => u.piece.heart).map((u) => u.piece.of));
       for (const p of placed) {
         const id = p.set!.id;
-        expect(Math.abs(p.x - r.x) + 0.01, `${key}: ${id}`).toBeLessThan(r.half - DUNGEON.wall);
-        expect(Math.abs(p.z - r.z) + 0.01, `${key}: ${id}`).toBeLessThan(r.half - DUNGEON.wall);
+        expect(Math.abs(p.x - r.x) + 0.01, `${key}: ${id}`).toBeLessThanOrEqual(r.half - DUNGEON.wall / 2); // within the wall's inner face (2026-11-26: a hung piece stands against it, world/wallFlush.ts)
+        expect(Math.abs(p.z - r.z) + 0.01, `${key}: ${id}`).toBeLessThanOrEqual(r.half - DUNGEON.wall / 2); // within the wall's inner face (2026-11-26: a hung piece stands against it, world/wallFlush.ts)
         expect(p.h, `${key}: ${id} is taller than its roof`).toBeLessThanOrEqual(DUNGEON.height - 1);
         if (reach(p) <= 0) continue;
-        if (p.set!.hung) {
-          const [sx, sz] = [Math.cos(p.yaw) * Math.max(p.w, 0.3), -Math.sin(p.yaw) * Math.max(p.w, 0.3)]; // a thing against a wall: not into a pillar or a jamb along it
-          for (const f of [-1, 0, 1]) expect(solidGap(d.parts, p.x + sx * f, p.z + sz * f, r.level), `${key}: ${id} in a pillar`).toBeGreaterThanOrEqual(0.12 - 0.01);
-        } else expect(solidGap(d.parts, p.x, p.z, r.level) - reach(p), `${key}: ${id} in a wall or a pillar`).toBeGreaterThanOrEqual(HALL.wall - 0.01);
+        // (a hung piece stands against its wall, touching it and in no pillar or jamb: tests/hungProps.test.ts)
+        if (!p.set!.hung) expect(solidGap(d.parts, p.x, p.z, r.level) - reach(p), `${key}: ${id} in a wall or a pillar`).toBeGreaterThanOrEqual(HALL.wall - 0.01);
         if (!hearts.has(id)) expect(Math.hypot(p.x - r.x, p.z - r.z) - reach(p), `${key}: ${id} across the middle`).toBeGreaterThanOrEqual(ROOM_INNER * (r.half - DUNGEON.wall) - 0.01);
       }
     }

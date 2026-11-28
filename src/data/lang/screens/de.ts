@@ -149,7 +149,6 @@ export const DE_SCREENS: Readonly<Record<ScreenKey, string>> = {
   'shop.noRoomChip': 'KEIN PLATZ',
   'ach.title': 'ERRUNGENSCHAFTEN',
   'guide.note': 'Was euch unterwegs gesagt wird, ist hier aufbewahrt, um es wieder zu lesen.',
-  'title.anyKey': 'eine beliebige Taste drücken',
   'map.charted': '{n} % VERMESSEN',
   'map.place1': '1 ORT VERZEICHNET',
   'map.placesN': '{n} ORTE VERZEICHNET',

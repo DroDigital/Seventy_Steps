@@ -45,8 +45,8 @@ describe("a boss hall's set (round 62: the halls were a heart, braziers and two 
       const placed = setsIn(d, r);
       expect(placed.length, `${boss}`).toBeGreaterThanOrEqual(6);
       for (const p of placed) {
-        expect(Math.abs(p.x - r.x) + 0.01, `${boss}: ${p.set!.id}`).toBeLessThan(r.half - DUNGEON.wall);
-        expect(Math.abs(p.z - r.z) + 0.01, `${boss}: ${p.set!.id}`).toBeLessThan(r.half - DUNGEON.wall);
+        expect(Math.abs(p.x - r.x) + 0.01, `${boss}: ${p.set!.id}`).toBeLessThanOrEqual(r.half - DUNGEON.wall / 2); // within the wall's inner face (2026-11-26: a hung piece stands against it, world/wallFlush.ts)
+        expect(Math.abs(p.z - r.z) + 0.01, `${boss}: ${p.set!.id}`).toBeLessThanOrEqual(r.half - DUNGEON.wall / 2); // within the wall's inner face (2026-11-26: a hung piece stands against it, world/wallFlush.ts)
         expect(p.h, `${boss}: ${p.set!.id} is taller than its roof`).toBeLessThanOrEqual(DUNGEON.height - 1);
       }
     }

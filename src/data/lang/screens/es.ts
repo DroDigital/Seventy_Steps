@@ -149,7 +149,6 @@ export const ES_SCREENS: Readonly<Record<ScreenKey, string>> = {
   'shop.noRoomChip': 'SIN SITIO',
   'ach.title': 'LOGROS',
   'guide.note': 'Lo que se te dice por el camino se guarda aquí, para leerlo de nuevo.',
-  'title.anyKey': 'pulsa cualquier tecla',
   'map.charted': '{n} % RECONOCIDO',
   'map.place1': '1 LUGAR CARTOGRAFIADO',
   'map.placesN': '{n} LUGARES CARTOGRAFIADOS',

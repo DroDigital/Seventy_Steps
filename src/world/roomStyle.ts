@@ -92,7 +92,7 @@ const lanes = (r: RoomLayout): [number, number][] => [...r.doors, ...r.windows].
  * The pillars of a room's plan, less any that would stand in a doorway's way, or within a pace of
  * somewhere a thing stands (`spots`: where signs, gates, tomes, bosses and spawns are put).
  */
-export function pillarsOf(s: RoomStyle, r: RoomLayout, spots: readonly (readonly [number, number])[]): Pillar[] {
+export function pillarsOf(s: RoomStyle, r: RoomLayout, spots: readonly (readonly [number, number, number?])[]): Pillar[] {
   const h = r.half;
   const wide = r.size === 3;
   const rad = wide ? 0.9 : 0.55;
@@ -128,13 +128,13 @@ export function pillarsOf(s: RoomStyle, r: RoomLayout, spots: readonly (readonly
   const lane = s === WIDE ? 0 : h - 6; // a doorway's lane runs 6 m in; a great hall that is no boss's keeps it clear to its middle (round 122: the Cavern of Flame's ring stood across its way)
   return at.filter(([u, v]) => {
     if (Math.max(Math.abs(u), Math.abs(v)) > h - 1.8) return false; // inside its walls
-    if (spots.some(([a, b]) => Math.hypot(u - a, v - b) < rad + 1.6)) return false;
+    if (spots.some(([a, b, keep]) => Math.hypot(u - a, v - b) < rad + (keep ?? 1.6))) return false; // (2026-11-27: a sign keeps its whole ring of runes clear, `keep`)
     return !ways.some(([lu, lv]) => u * lu + v * lv > lane && Math.abs(-u * lv + v * lu) < rad + 2.2); // nor in a doorway's lane
   }).map(([u, v]) => [u, v, rad] as const);
 }
 
 /** The corners of a cross-shaped hall, filled solid (each as a box: u0, u1, v0, v1), unless one would hold a spot or a doorway. */
-export function cornersOf(s: RoomStyle, r: RoomLayout, spots: readonly (readonly [number, number])[]): (readonly [number, number, number, number])[] {
+export function cornersOf(s: RoomStyle, r: RoomLayout, spots: readonly (readonly [number, number, number?])[]): (readonly [number, number, number, number])[] {
   const [h, c] = [r.half, s.corners];
   if (c <= 0) return [];
   const boxes = [[1, 1], [1, -1], [-1, 1], [-1, -1]].map(([a, b]) => [Math.min(a * (h - c), a * h), Math.max(a * (h - c), a * h), Math.min(b * (h - c), b * h), Math.max(b * (h - c), b * h)] as const);

@@ -16,7 +16,7 @@ export const GREAT_OLD_ONES = tier('great_old_one', [
       ph(0.66, { cthulhu_feelers: 2, cthulhu_claw: 2, cthulhu_wings: 2, cthulhu_call: 1, cthulhu_surge: 1, cthulhu_rise: 2, cthulhu_fall: 1 }, { summons: ['star_spawn', 'star_spawn'], hooks: ['camera_warp', 'flood'] }),
       ph(0.33, { cthulhu_claw: 1, cthulhu_feelers: 2, cthulhu_seize: 1, cthulhu_wings: 1, cthulhu_call: 2, cthulhu_rise: 1, cthulhu_drown: 1, cthulhu_surge: 1, cthulhu_fall: 1 }, { hooks: ['flood', 'camera_warp'], arena: 'ship' }),
     )),
-    stats: st(6050, 5000, 24, 2, 10, 20), drops: { echoes: 30000 }, insightOnSight: 4, // (round 97: health 4650 to 5350, its highest in the tables) (round 25: health 6700 and damage 120; the balance table had it at 188 s and 9.3 lives) (round 60: health 4300 and damage 35, no blow over 16% of a person's health where they meet it; a crushing blow restored, held a second)
+    stats: st(6050, 5000, 31, 2, 10, 20), drops: { echoes: 30000 }, insightOnSight: 4, // (round 97: health 4650 to 5350, its highest in the tables) (round 25: health 6700 and damage 120; the balance table had it at 188 s and 9.3 lives) (round 60: health 4300 and damage 35, no blow over 16% of a person's health where they meet it; a crushing blow restored, held a second)
   },
   {
     id: 'father_dagon', name: 'Father Dagon', source: 'Dagon', regions: ['innsmouth'], canonLooks: true,

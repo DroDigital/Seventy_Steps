@@ -2,9 +2,11 @@
  * The main menu (Phase 6): the name and its lines over black, the veil's purple haunting the edges
  * (playtest round 8), then Continue (when the slot in use holds a save), New game (in a slot chosen,
  * asking before one is overwritten), Load (round 12: three slots), Settings, Controls and Credits.
- * It opens on the first key press or click (what lets a browser play the title's theme), or by
- * itself when the theme sounds without one (main.ts). Its choice starts the open world; the title
- * stays until the veil has covered it.
+ * It opens on the first key press, click or pad button (what lets a browser play the title's theme),
+ * or by itself when the theme sounds without one (main.ts): nothing of it shows until then (the veil
+ * says what it waits for), and then the dark draws back from the middle, the name takes fire and the
+ * menu gathers out of the mist a line at a time (2026-11-27). Its choice starts the open world; the
+ * title stays until the veil has covered it.
  */
 
 import { slotParts, type SlotLine } from './titleSlots';
@@ -18,6 +20,7 @@ import { saveNow } from './autosave';
 import { desktop } from './desktop';
 import { button, createScreen, el, heading, LIFT_ROOM, type Page } from './menuKit';
 import { wordmark } from './logo';
+import { listenForWake } from './titleWake';
 import { EDITION } from '../data/edition';
 import { settingsPage } from './menuPages';
 import type { SettingId, Settings } from './settings';
@@ -36,12 +39,17 @@ export interface TitleOptions {
   start(fresh: boolean, close: () => void, difficulty?: DifficultyId): void;
 }
 
+/** Seconds after waking before the menu gathers in: the dark has begun to draw back from the middle, where it stands. */
+const REVEAL = 0.45;
+/** Its lines come in one after another (ms): the first after `first`, each `each` later, over `rise`. */
+const LINES = { first: 260, each: 85, rise: 720 };
+
 export function showTitle(o: TitleOptions): void {
   const screen = createScreen(5, '#000', 'left:50%;top:66%;transform:translate(-50%,-50%);width:min(560px,94vw);max-height:60vh;overflow-x:hidden;overflow-y:auto;text-align:center;' + LIFT_ROOM); // the menu stands in the lower half; the name has the upper (round 38)
   const logo = wordmark(); // the name cut in stone (round 20), made once
   // The name: a layer of its own over the upper half, standing midway between the top of the screen and the menu under it (`settle`), so each page of the menu below can stand where it likes.
   const head = document.createElement('div');
-  head.style.cssText = `position:fixed;inset:0;z-index:6;pointer-events:none;transition:opacity .5s;font:14px/1.45 ${SERIF};color:${BONE}`;
+  head.style.cssText = `position:fixed;inset:0;z-index:6;pointer-events:none;opacity:0;transition:opacity .9s ease-out;font:14px/1.45 ${SERIF};color:${BONE}`;
   const headLayer = el(head, 'div', '', SCALED_LAYER);
   const headBox = el(headLayer, 'div', '', 'position:absolute;left:0;right:0;top:29%;transform:translateY(-50%);text-align:center');
   headBox.append(logo.canvas);
@@ -81,24 +89,26 @@ export function showTitle(o: TitleOptions): void {
     o.start(fresh, () => screen.close(true), difficulty);
   };
   let awake = false;
+  let entering = true; // the menu's first coming, line by line (not when a page goes back to it)
   const wake = (): void => {
     if (awake) return;
     awake = true;
+    stopListening();
     o.open();
     logo.play(); // the letters take fire as the dark draws back
-    removeEventListener('pointerdown', wake, true);
-    setTimeout(() => screen.show(main), 350); // a beat, and the waking key or click is spent before the menu stands under it
+    setTimeout(() => screen.show(main), REVEAL * 1000); // the name and the menu come in together, settled in place before they show
   };
+  const stopListening = listenForWake(wake);
   void o.byItself.then(wake);
-  const gate: Page = placed({
-    keys: wake,
-    build(p) {
-      const call = button(el(p, 'div', '', 'width:260px;margin:0 auto'), t('title.press'), wake);
-      call.style.cssText += ';text-align:center;border-color:transparent;background:none;letter-spacing:3px';
-      call.animate([{ opacity: 0.2 }, { opacity: 0.75 }], { duration: 1600, direction: 'alternate', iterations: Infinity, easing: 'ease-in-out' });
-    },
-  }, '66%', true);
-  addEventListener('pointerdown', wake, true);
+  /** The menu's lines gather one after another, the first time it stands. */
+  const gather = (menu: HTMLElement): void => {
+    if (!entering || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    entering = false;
+    [...menu.children].forEach((line, i) => (line as HTMLElement).animate(
+      [{ opacity: 0, filter: 'blur(7px)', transform: 'translateY(7px)' }, { opacity: 1, filter: 'blur(0)', transform: 'none' }],
+      { duration: LINES.rise, delay: LINES.first + i * LINES.each, easing: 'cubic-bezier(.2,.7,.25,1)', fill: 'backwards' },
+    ));
+  };
   const main: Page = placed({
     build(p) {
       const menu = el(p, 'div');
@@ -119,6 +129,7 @@ export function showTitle(o: TitleOptions): void {
         gap();
         button(menu, t('menu.quit'), () => (saveNow(), void desktop!.quit())).classList.add('exit');
       }
+      gather(menu);
     },
   }, '66%', true);
   const settingsHere = (): Page => placed(settingsPage(o.settings, o.change, () => screen.show(main), o.saveKeys, 0), '50%', false);
@@ -166,5 +177,4 @@ export function showTitle(o: TitleOptions): void {
       button(menu, t('title.yes'), () => screen.show(difficultyPage(slot)));
     },
   }, '66%', true);
-  screen.show(gate);
 }

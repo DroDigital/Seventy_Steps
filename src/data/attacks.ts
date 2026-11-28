@@ -9,6 +9,7 @@
 
 import { OWN_SPECS } from './bossMoves';
 import type { OwnSpec } from './bossMoveKit';
+import { leastWindup, pacedMarks } from './bossPace';
 import { recoveryFor, type PunishBand } from './bossPunish';
 import type { CloudDef, EffectKind, MarkLook, MarkPattern, MoveDef } from './moves';
 import type { AttackId, LibraryId, Stats } from './schema';
@@ -137,6 +138,22 @@ export function resolveOwn(s: OwnSpec): AttackDef {
 /** Every attack: the library's, and every horror's own (data/bossMoves.ts). */
 export const ATTACKS = { ...LIBRARY, ...Object.fromEntries(Object.entries(OWN_SPECS).map(([id, s]) => [id, resolveOwn(s)])) } as Readonly<Record<AttackId, AttackDef>>;
 
+/** What leads into each link of a chain (the blow whose `follow` it is). */
+const LEAD: ReadonlyMap<AttackId, AttackDef> = new Map(Object.values(ATTACKS).filter((a) => a.follow).map((a) => [a.follow!, a]));
+
+/**
+ * A horror's blow as it is struck (2026-11-27, data/bossPace.ts): wound up no quicker than its band, its weight, its body and its lunge
+ * allow, and its marks seen long enough to leave. Without a band (a lesser foe), the library's own.
+ */
+export function pacedAttack(id: AttackId, height: number, band?: PunishBand): AttackDef {
+  const a = ATTACKS[id];
+  if (!band) return a;
+  const windup = Math.max(a.windup, leastWindup(a, LEAD.get(id), band, Math.sqrt(sizeFactor(height))));
+  const marks = a.marks && { ...a.marks, ...pacedMarks(a.marks) };
+  if (windup === a.windup && (!marks || (marks.delay === a.marks!.delay && marks.stagger === a.marks!.stagger))) return a;
+  return { ...a, windup, ...(marks && { marks }) };
+}
+
 /** Body size relative to a human (1.9 m); big bodies reach further. */
 export const sizeFactor = (height: number): number => Math.max(1, height / 1.9);
 
@@ -162,7 +179,7 @@ export function attackRange(id: AttackId, height: number): readonly [number, num
 
 /** A MoveDef for this attack on a body `height` metres tall with these stats; a horror's `band` is how long it is held after the blow (data/bossPunish.ts, round 83). */
 export function compileAttack(id: AttackId, stats: Stats, height: number, band?: PunishBand): MoveDef {
-  const a = ATTACKS[id];
+  const a = pacedAttack(id, height, band); // a horror's paced (2026-11-27)
   const k = sizeFactor(height);
   const frames = a.windup + a.active + recoveryFor(a, band);
   const far = a.far ?? a.range[1];

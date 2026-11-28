@@ -53,6 +53,7 @@ import { createTentacles } from './tentacles';
 import { createWayFx } from './wayFx';
 import { createVigilMarks } from './vigilMarks';
 import { createWayViews } from './wayViews';
+import { createTrapViews } from './trapViews';
 import { createWeatherFx } from './weather';
 import type { Skyline } from './skyline';
 import type { WorldLights } from './worldLights';
@@ -107,6 +108,7 @@ export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, p
   const air = createArenaAir(g, parts.particles); // round 61: what drifts in an arena's air
   const ways = createWayViews(scene, g); // round 62: the plates, tablets and lights of the trails to the open arenas
   const wayFx = createWayFx(g, parts.particles, parts.ground); // ...and their rings, bursts and blight
+  const traps = createTrapViews(scene, g, parts.particles); // 2026-11-27: the dungeons' traps: spikes, darts, blades, jets, slabs, boulders, vents, eyes
   createVigilMarks(g, parts.ground); // round 64: a vigil's ring, and how far it is kept
   const rods = createRodFx(g, parts.particles, parts.beams, lightning); // round 67: the bolts that leap to a walled court's lightning rods
   const court = createCourtLife(scene, g, parts.particles); // round 68: a court's river and its mists, a dam's spillway and its dust (round 75: and its pools)
@@ -138,6 +140,7 @@ export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, p
       air.update(camera, time, !outside);
       ways.update(camera.position, time, !outside);
       wayFx.update(time, camera.position);
+      traps.update(camera.position, time, !g.overworld);
       rods.update(camera.position, time, !outside);
       court.update(camera.position, time, !outside);
       signals.update(camera.position, time, !outside);

@@ -63,16 +63,16 @@ export const yig: PlaceFn = (c: Court, h: House) => {
   for (const side of [-1, 1]) {
     c.add('px_brazier', b + 4.6, side * 4.2, { y: UP, tint: [0.4, 0.34, 0.28], keep: 0.5, s: 1.3, lit: 'fire' });
     c.add('tp_flag_stars', b + 1.4, side * 3.2, { y: 2.4 + UP, face: 'front', s: 1.3, walk: true });
-    c.add('bn_pile_skull', b + 5.2, side * 1.9, { y: UP, s: 1.4, jitter: 0.3, walk: true });
+    c.add('bn_pile_skull', b + 5.2, side * 1.9, { y: UP, floor: UP, s: 1.4, jitter: 0.3, walk: true });
   }
-  for (const [a, cc] of [[b + 3.4, 5.2], [b + 2.2, -5.2], [b + 4.6, 0.6]] as const) c.add('bn_ribcage', a, cc, { y: UP, s: 1.6, jitter: 0.5, face: 'front', turn: a * 31, walk: true });
+  for (const [a, cc] of [[b + 3.4, 5.2], [b + 2.2, -5.2], [b + 4.6, 0.6]] as const) c.add('bn_ribcage', a, cc, { y: UP, floor: UP, s: 1.6, jitter: 0.5, face: 'front', turn: a * 31, walk: true });
   // the pits: what was given to him, thrown down: a heap of skulls, a ribcage, a spine, and a fang that was left standing
   for (const [i, th] of pits.entries()) {
     const at = (k: number, l: number): [number, number] => [Math.cos(th) * (32.5 + k) - Math.sin(th) * l, Math.sin(th) * (32.5 + k) + Math.cos(th) * l];
-    c.add('bn_pile_skull', ...at(0.6, 0.8), { y: DOWN, s: 1.7, jitter: 0.5, walk: true });
-    c.add('bn_ribcage', ...at(-1.2, -1.4), { y: DOWN, s: 1.8, jitter: 0.4, turn: i * 70, walk: true });
-    c.add(i % 2 ? 'bn_spine' : 'bn_leg', ...at(1.4, -1.6), { y: DOWN, s: 1.8, jitter: 0.3, turn: i * 41, walk: true });
-    c.add('px_fang', ...at(-0.4, 1.8), { tint: [0.85, 0.82, 0.7], keep: 0.9, y: DOWN - 0.1, s: 0.9, turn: i * 90, walk: true });
+    c.add('bn_pile_skull', ...at(0.6, 0.8), { y: DOWN, floor: DOWN, s: 1.7, jitter: 0.5, walk: true });
+    c.add('bn_ribcage', ...at(-1.2, -1.4), { y: DOWN, floor: DOWN, s: 1.8, jitter: 0.4, turn: i * 70, walk: true });
+    c.add(i % 2 ? 'bn_spine' : 'bn_leg', ...at(1.4, -1.6), { y: DOWN, floor: DOWN, s: 1.8, jitter: 0.3, turn: i * 41, walk: true });
+    c.add('px_fang', ...at(-0.4, 1.8), { tint: [0.85, 0.82, 0.7], keep: 0.9, y: DOWN - 0.1, s: 0.9, turn: i * 90 }); // (2026-11-27: a fang stands: it was walked through)
   }
   const out = b + 9.6; // the court before the shrine: bones where they were left, the settlers' wagon
   for (const [i, [a, cc]] of ([[out, -9.4], [out + 3, 11], [out + 1.4, 3], [out + 6, -3]] as const).entries()) c.add(i % 2 ? 'bn_spine' : 'bn_leg', a, cc, { s: 1.6, jitter: 1, face: 'front', turn: i * 49, walk: true });

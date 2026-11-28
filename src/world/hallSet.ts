@@ -16,6 +16,7 @@ import { roomPoint, type RoomLayout } from './dungeonKit';
 import { roomSpots, standing, type Part } from './dungeonParts';
 import { solidGap } from './candlePlan';
 import type { Prop } from './props';
+import { besideAnother, hangOnWall } from './wallFlush';
 import { DIRS } from './worldMap';
 
 export const HALL = {
@@ -48,7 +49,7 @@ function setProps(set: ArenaSet, r: RoomLayout, parts: readonly Part[], dressing
   const d = r.def;
   const ring = 6 + roomSpots(r).ring.length; // past the ring, an ally's place of its own (round 123: `allyAt`, dungeonParts.ts `standing`)
   const used = (i: number): boolean => inner === undefined || (i === 1 || i === 2 ? !!d.sign : i === 3 ? !!d.gate : i < 6 ? i === 4 || i === 5 : i >= ring ? !!d.allyAt : i - 6 < (d.spawns?.length ?? 0) + (d.ally && !d.allyAt ? 1 : 0)); // (an ordinary room keeps clear only the spots its own things stand on)
-  const things = standing(r).map((u, i) => ({ at: roomPoint(r, ...u), clear: i === 1 || i === 3 ? (inner === undefined ? HALL.shrine : HALL.roomShrine) : inner === undefined ? HALL.thing : HALL.roomThing, i })).filter((t) => used(t.i)); // [centre, sign, rest, gate, tome, ...]
+  const things = standing(r).map((u, i) => ({ at: roomPoint(r, u[0], u[1]), clear: i === 1 || i === 3 ? (inner === undefined ? HALL.shrine : HALL.roomShrine) : inner === undefined ? HALL.thing : HALL.roomThing, i })).filter((t) => used(t.i)); // [centre, sign, rest, gate, tome, ...]
   const doors = [...r.doors, ...r.windows].map((s) => ({ x: r.x + DIRS[s].x * r.half, z: r.z + DIRS[s].z * r.half, ix: -DIRS[s].x, iz: -DIRS[s].z })); // (round 127: a window is kept clear as a doorway is)
   const solids = dressing.filter((p) => reach(p) > 0);
   const taken = (p: Prop): boolean => {
@@ -66,5 +67,11 @@ function setProps(set: ArenaSet, r: RoomLayout, parts: readonly Part[], dressing
     if (things.some((t) => Math.hypot(p.x - t.at.x, p.z - t.at.z) - k < t.clear)) return true;
     return solids.some((o) => Math.hypot(p.x - o.x, p.z - o.z) - reach(o) - k < HALL.dress);
   };
-  return arenaSet(set, { x: r.x, z: r.z, y: r.level, radius: r.half - DUNGEON.wall, front: { x: toward.x, z: toward.z }, well: false, inner }, taken);
+  const laid = arenaSet(set, { x: r.x, z: r.z, y: r.level, radius: r.half - DUNGEON.wall, front: { x: toward.x, z: toward.z }, well: false, inner }, taken);
+  const stood: Prop[] = []; // (2026-11-26: a hung piece against its wall, not a metre short of it; slid along it to an even stretch if need be: wallFlush.ts)
+  for (const p of laid) {
+    const q = p.set?.hung ? hangOnWall(p, parts, (c) => !taken(c) && !besideAnother(c, laid.filter((o) => o !== p && !stood.includes(o)).concat(stood))) : p;
+    if (q) stood.push(q);
+  }
+  return stood;
 }

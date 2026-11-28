@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { dungeonPieces, type Group } from '../src/render/siteMeshes';
-import { DUNGEON } from '../src/data/tuning';
-import { floorRange, kitOfRoom, type RoomLayout } from '../src/world/dungeonKit';
+import { DUNGEON, LINK } from '../src/data/tuning';
+import { floorRange, kitOfRoom, type DoorLayout, type RoomLayout } from '../src/world/dungeonKit';
 import type { Dungeon } from '../src/world/placements';
 import { DIRS } from '../src/world/worldMap';
 import { faces, type Face } from './depthAudit';
@@ -182,13 +182,14 @@ function exitOf(s: Sight): { t: number; axis: number } {
 /** Whether the ray leaves the room by one of its doorways. */
 function byDoor(d: Dungeon, s: Sight, t: number): boolean {
   const p = s.from.clone().addScaledVector(s.dir, t);
-  return d.layout.doors.some((o) => {
+  const through = (o: DoorLayout, width: number, top: number): boolean => {
     if (o.a !== s.room && o.b !== s.room) return false;
     const n = DIRS[o.side];
     const side = Math.abs((p.x - o.x) * -n.z + (p.z - o.z) * n.x);
     const across = Math.abs((p.x - o.x) * n.x + (p.z - o.z) * n.z);
-    return side < DUNGEON.door / 2 + 0.6 && across < DUNGEON.wall + 0.8 && p.y > o.level - 0.5 && p.y < o.level + DUNGEON.lintel + 0.5;
-  });
+    return side < width / 2 + 0.6 && across < DUNGEON.wall + 0.8 && p.y > o.level - 0.5 && p.y < o.level + top + 0.5;
+  };
+  return d.layout.doors.some((o) => through(o, DUNGEON.door, DUNGEON.lintel)) || d.layout.windows.some((o) => through(o, LINK.windowWidth, LINK.windowTop)); // (2026-11-27: a window is left by the eye as a doorway is: the church's aisle, a hall now, looks up through its grate to the balcony)
 }
 
 /** Whether a point on a face's plane lies within the face, at least `-slack` metres from its edges (or, given a positive slack, that near it). */
