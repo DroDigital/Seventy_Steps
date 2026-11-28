@@ -166,7 +166,7 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
     if (e.sanity || e.insight) say([story(e.name).toUpperCase(), e.sanity && tr('hud.sanityLoss', { n: e.sanity }), e.insight && tr('hud.insightGain', { sign: sign(e.insight), n: Math.abs(e.insight) })].filter(Boolean).join('  '));
   });
   g.events.on('InsightChanged', (e) => {
-    if (e.cause === 'tome' || e.cause === 'upgrade') say(`${e.source.toUpperCase()}  ${tr('hud.insightGain', { sign: sign(e.change), n: Math.abs(e.change) })}`);
+    if (e.cause === 'tome' || e.cause === 'upgrade') say(`${story(e.source).toUpperCase()}  ${tr('hud.insightGain', { sign: sign(e.change), n: Math.abs(e.change) })}`);
   });
   g.events.on('Vanquished', (e) => great.show(tr('hud.vanquished'), 'victory', story(e.name).toUpperCase(), story(EPITAPHS[creatureOf(g, e.entity)?.id ?? ''] ?? '') || undefined));
   g.events.on('Exhaled', (e) => setTimeout(() => great.show(tr('hud.breathes'), 'place', story(e.name).toUpperCase(), tr('hud.breathesNote')), 7500)); // after the fall's own words (round 26)

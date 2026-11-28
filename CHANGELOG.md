@@ -5,6 +5,7 @@ player would notice, newest first. Versions before 1.0 were never released.
 
 ## 1.5.0
 
+- **The whole game in German, French and Spanish.** Until now only the menus, the hints and the HUD were translated. Now everything you read is: what every person says and mutters, every quest, tome, note and letter, every place's and creature's name, the bestiary, the secrets of the land, what is read when you fall and under the veil, the cutscenes' captions and what the horrors say, the endings, the Elder Sign's menu, the map, the arms, the shop, the ending card, the achievements and the credits. The voices stay in English, with their words shown in your language.
 - **The game knows its version.** Every build since 1.0.8 called itself 1.0.8 in its crash reports and its saves, whatever itch.io showed (1.4.9 the last). The version typed for an itch.io push is now stamped into the build, so the game, its crash report, its saves and the app's own version all say the same as the page, and every full game pushed to itch.io is tagged in the repository (`v1.5.0`, and so on).
 
 ## 1.4.1 to 1.4.9
