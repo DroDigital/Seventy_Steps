@@ -1,6 +1,11 @@
 /** The story in Spanish (data/lang/story/index.ts): a table for every domain. */
 
 import type { StoryBook } from '..';
+import { ES_ARMS } from './arms';
+import { ES_WARES } from './wares';
+import { ES_ACHIEVEMENTS } from './achievements';
+import { ES_ROOMS } from './rooms';
+import { ES_CREDITS } from './credits';
 import { ES_BLOWS } from './blows';
 import { ES_BLOWSMORE } from './blowsMore';
 import { ES_CREATURES } from './creatures';
@@ -37,4 +42,9 @@ export const ES_STORY: StoryBook = {
   blows: { ...ES_BLOWS, ...ES_BLOWSMORE },
   lore: ES_LORE,
   scenes: ES_SCENES,
+  arms: ES_ARMS,
+  wares: ES_WARES,
+  achievements: ES_ACHIEVEMENTS,
+  rooms: ES_ROOMS,
+  credits: ES_CREDITS,
 };

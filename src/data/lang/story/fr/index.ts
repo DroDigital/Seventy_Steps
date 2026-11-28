@@ -1,6 +1,11 @@
 /** The story in French (data/lang/story/index.ts): a table for every domain. */
 
 import type { StoryBook } from '..';
+import { FR_ARMS } from './arms';
+import { FR_WARES } from './wares';
+import { FR_ACHIEVEMENTS } from './achievements';
+import { FR_ROOMS } from './rooms';
+import { FR_CREDITS } from './credits';
 import { FR_BLOWS } from './blows';
 import { FR_BLOWSMORE } from './blowsMore';
 import { FR_CREATURES } from './creatures';
@@ -37,4 +42,9 @@ export const FR_STORY: StoryBook = {
   blows: { ...FR_BLOWS, ...FR_BLOWSMORE },
   lore: FR_LORE,
   scenes: FR_SCENES,
+  arms: FR_ARMS,
+  wares: FR_WARES,
+  achievements: FR_ACHIEVEMENTS,
+  rooms: FR_ROOMS,
+  credits: FR_CREDITS,
 };

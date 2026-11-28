@@ -64,7 +64,7 @@ export function createBossHud(g: Game, root: HTMLElement, say: (text: string) =>
   });
   g.events.on('LampChanged', (e) => say(t(e.lit ? 'boss.lampOn' : 'boss.lampOut')));
   g.events.on('Petrified', () => say(t('boss.stone')));
-  g.events.on('Title', (e) => show(e.text));
+  g.events.on('Title', (e) => show(story(e.text))); // a room's words, in the language chosen (1.5.0)
   g.events.on('Named', (e) => {
     name.textContent = story(e.name);
     nameUntil = performance.now() + NAME_MS * e.count; // it stays longer each time it comes

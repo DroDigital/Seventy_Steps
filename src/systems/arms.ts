@@ -8,7 +8,7 @@
  */
 
 import type { Entity } from '../core/ecs';
-import { t } from '../core/i18n';
+import { story, t } from '../core/i18n';
 import { REINFORCE, STAR_STONES } from '../data/tuning';
 import { getEntity } from '../data/registry';
 import { armedMoves, isWeapon, WEAPON_IDS, WEAPONS, type WeaponId } from '../data/weapons';
@@ -31,7 +31,7 @@ export function takeUp(g: Game, id: string, from?: string): void {
   if (!isWeapon(id) || g.player.arms.includes(id)) return;
   g.player.arms.push(id);
   markNew(g, 'weapon', id);
-  g.events.emit('Notice', { text: t('n.newWeapon', { name: WEAPONS[id].name.toUpperCase() }) }); // the HUD names the button
+  g.events.emit('Notice', { text: t('n.newWeapon', { name: story(WEAPONS[id].name).toUpperCase() }) }); // the HUD names the button
   g.events.emit('Found', { kind: 'weapon', id, from });
 }
 

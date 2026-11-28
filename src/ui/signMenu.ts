@@ -114,7 +114,7 @@ export function createSignMenu(g: Game, go: (words: string, jump: () => void, li
       const level = g.player.reinforced[id];
       const cost = reinforceCost(g, id);
       const light = (n: number): number => Math.round((WEAPONS[id].moves.light1?.hit?.damage ?? 0) * might(g, g.player.id) * edgeAt(n));
-      const b = option(panel, cost === undefined ? `${WEAPONS[id].name}  +${level}` : `${WEAPONS[id].name}  +${level} → +${level + 1}`, () => (reinforce(g, id), main.redraw?.()), canReinforce(g, id), cost === undefined ? `${WEAPONS[id].name} is fully reinforced.` : lacks(cost));
+      const b = option(panel, cost === undefined ? `${story(WEAPONS[id].name)}  +${level}` : `${story(WEAPONS[id].name)}  +${level} → +${level + 1}`, () => (reinforce(g, id), main.redraw?.()), canReinforce(g, id), cost === undefined ? `${story(WEAPONS[id].name)} is fully reinforced.` : lacks(cost));
       if (cost !== undefined) chips(b, [{ text: `Light blow ${light(level)} → ${light(level + 1)}`, tone: 'good' }]);
       price(b, cost === undefined ? 'MAX' : stones(cost), cost === undefined ? 'max' : canReinforce(g, id) ? 'ok' : 'no');
     }

@@ -6,7 +6,7 @@
  * it takes. Pure: no Three.js.
  */
 
-import { t } from '../core/i18n';
+import { story, t } from '../core/i18n';
 import { hash2 } from '../core/rng';
 import { RELICS, RELIC_IDS, RELIC_SLOTS, TEMPERS, type Relic, type RelicId } from '../data/relics';
 import type { Game } from './components';
@@ -83,7 +83,7 @@ export function registerRelics(g: Game): void {
     if (!id || !g.overworld) return;
     const on = grant(g, id);
     markNew(g, 'relic', id);
-    const words = t(on ? 'n.relicWorn' : 'n.relicKept', { name: RELICS[id].name.toUpperCase() });
+    const words = t(on ? 'n.relicWorn' : 'n.relicKept', { name: story(RELICS[id].name).toUpperCase() });
     g.events.emit('Notice', { text: words });
     g.events.emit('Found', { kind: 'relic', id, from: name, worn: on });
   });

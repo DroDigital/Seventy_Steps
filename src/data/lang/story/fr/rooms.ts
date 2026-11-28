@@ -1,0 +1,93 @@
+/** The words a dungeon's rooms say as they are entered in French. */
+
+import type { StoryTable } from '..';
+
+export const FR_ROOMS: StoryTable = {
+  library: {
+    "THE CIRCULATION DESK": "LE COMPTOIR DE PRÊT",
+    "THE SUB-BASEMENT": "LE SOUS-SOL",
+  },
+  munoz_rooms: {
+    "THE REFRIGERATING PLANT": "L'INSTALLATION FRIGORIFIQUE",
+  },
+  outsider_crypt: {
+    "THE MIRROR": "LE MIROIR",
+  },
+  witch_house: {
+    "THE SERVANTS' STAIR": "L'ESCALIER DE SERVICE",
+    "THE CELLAR": "LA CAVE",
+    "THE RAT-HOLES": "LES TROUS À RATS",
+  },
+  sentinel_hill: {
+    "THE ROUND HILLS": "LES COLLINES RONDES",
+    "THE CROWN OF THE HILL": "LE SOMMET DE LA COLLINE",
+  },
+  whateley_farm: {
+    "THE BOARDED UPSTAIRS": "L'ÉTAGE CONDAMNÉ",
+    "THE BOARDED ROOMS": "LES CHAMBRES CONDAMNÉES",
+  },
+  yhanthlei: {
+    "THE SPAWNING POOLS": "LES BASSINS DE FRAI",
+    "THE TEMPLE OF DAGON": "LE TEMPLE DE DAGON",
+  },
+  curwen_catacombs: {
+    "THE PITS": "LES FOSSES",
+    "THE NICHES": "LES NICHES",
+    "CURWEN'S STUDY": "LE CABINET DE CURWEN",
+    "CURWEN'S LABORATORY": "LE LABORATOIRE DE CURWEN",
+  },
+  starry_wisdom: {
+    "THE UNDERCROFT": "LA CRYPTE",
+    "THE ORGAN LOFT": "LA TRIBUNE DE L'ORGUE",
+  },
+  shunned_cellar: {
+    "THE SHAPE IN THE NITRE": "LA FORME DANS LE SALPÊTRE",
+  },
+  red_hook_vaults: {
+    "LILITH'S SHRINE": "LE SANCTUAIRE DE LILITH",
+  },
+  old_man_house: {
+    "THE TERRIBLE OLD MAN": "LE TERRIBLE VIEILLARD",
+  },
+  akeley: {
+    "THE OUTPOST": "L'AVANT-POSTE",
+    "THE BRAIN-CYLINDERS": "LES CYLINDRES À CERVEAUX",
+  },
+  elder_city: {
+    "THE STAR-HEADED CITY": "LA CITÉ DES TÊTES ÉTOILÉES",
+  },
+  archives: {
+    "THE HALL OF MACHINES": "LA SALLE DES MACHINES",
+    "THE BASALT DEEPS": "LES PROFONDEURS DE BASALTE",
+  },
+  tsath: {
+    "RED-LITTEN YOTH": "YOTH AUX LUEURS ROUGES",
+    "THE TEMPLE OF TSATH": "LE TEMPLE DE TSATH",
+  },
+  ulthar_kadath: {
+    "THE TEMPLE OF THE ELDER ONES": "LE TEMPLE DES ANCIENS",
+    "THE BLACK GALLEYS": "LES GALÈRES NOIRES",
+    "DYLATH-LEEN": "DYLATH-LEEN",
+    "THE CITY OF THE GUGS": "LA CITÉ DES GUGS",
+    "THE TOWER OF KOTH": "LA TOUR DE KOTH",
+  },
+  risen_rlyeh: {
+    "THE SUNKEN COURT": "LA COUR ENGLOUTIE",
+    "THE ANGLES ARE WRONG": "LES ANGLES SONT FAUX",
+    "THE TOMB OF MU": "LE TOMBEAU DE MU",
+  },
+  migo_cities: {
+    "THE SURGERY OF THE OUTER ONES": "LA CHIRURGIE DE CEUX DU DEHORS",
+    "THE BLACK TOWERS": "LES TOURS NOIRES",
+    "THE CYLINDERS": "LES CYLINDRES",
+  },
+  ultimate_void: {
+    "THE NADIR": "LE NADIR",
+  },
+  slumber: {
+    "THE SEVENTY STEPS OF LIGHT SLUMBER": "LES SOIXANTE-DIX MARCHES DU SOMMEIL LÉGER",
+    "THE CAVERN OF FLAME": "LA CAVERNE DE LA FLAMME",
+    "THE SEVEN HUNDRED STEPS OF DEEPER SLUMBER": "LES SEPT CENTS MARCHES DU SOMMEIL PROFOND",
+    "THE GATE OF DEEPER SLUMBER": "LA PORTE DU SOMMEIL PROFOND",
+  },
+};

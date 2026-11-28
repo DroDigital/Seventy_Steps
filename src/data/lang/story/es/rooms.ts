@@ -1,0 +1,93 @@
+/** The words a dungeon's rooms say as they are entered in Spanish. */
+
+import type { StoryTable } from '..';
+
+export const ES_ROOMS: StoryTable = {
+  library: {
+    "THE CIRCULATION DESK": "EL MOSTRADOR DE PRÉSTAMO",
+    "THE SUB-BASEMENT": "EL SUBSÓTANO",
+  },
+  munoz_rooms: {
+    "THE REFRIGERATING PLANT": "LA PLANTA FRIGORÍFICA",
+  },
+  outsider_crypt: {
+    "THE MIRROR": "EL ESPEJO",
+  },
+  witch_house: {
+    "THE SERVANTS' STAIR": "LA ESCALERA DE SERVICIO",
+    "THE CELLAR": "EL SÓTANO",
+    "THE RAT-HOLES": "LAS RATONERAS",
+  },
+  sentinel_hill: {
+    "THE ROUND HILLS": "LAS COLINAS REDONDAS",
+    "THE CROWN OF THE HILL": "LA CIMA DE LA COLINA",
+  },
+  whateley_farm: {
+    "THE BOARDED UPSTAIRS": "EL PISO DE ARRIBA TAPIADO",
+    "THE BOARDED ROOMS": "LAS HABITACIONES TAPIADAS",
+  },
+  yhanthlei: {
+    "THE SPAWNING POOLS": "LOS ESTANQUES DE DESOVE",
+    "THE TEMPLE OF DAGON": "EL TEMPLO DE DAGÓN",
+  },
+  curwen_catacombs: {
+    "THE PITS": "LOS FOSOS",
+    "THE NICHES": "LOS NICHOS",
+    "CURWEN'S STUDY": "EL ESTUDIO DE CURWEN",
+    "CURWEN'S LABORATORY": "EL LABORATORIO DE CURWEN",
+  },
+  starry_wisdom: {
+    "THE UNDERCROFT": "LA CRIPTA",
+    "THE ORGAN LOFT": "EL CORO DEL ÓRGANO",
+  },
+  shunned_cellar: {
+    "THE SHAPE IN THE NITRE": "LA FORMA EN EL SALITRE",
+  },
+  red_hook_vaults: {
+    "LILITH'S SHRINE": "EL SANTUARIO DE LILITH",
+  },
+  old_man_house: {
+    "THE TERRIBLE OLD MAN": "EL TERRIBLE ANCIANO",
+  },
+  akeley: {
+    "THE OUTPOST": "EL PUESTO AVANZADO",
+    "THE BRAIN-CYLINDERS": "LOS CILINDROS DE CEREBROS",
+  },
+  elder_city: {
+    "THE STAR-HEADED CITY": "LA CIUDAD DE LAS CABEZAS ESTRELLADAS",
+  },
+  archives: {
+    "THE HALL OF MACHINES": "LA SALA DE LAS MÁQUINAS",
+    "THE BASALT DEEPS": "LAS PROFUNDIDADES DE BASALTO",
+  },
+  tsath: {
+    "RED-LITTEN YOTH": "YOTH, DE LUZ ROJA",
+    "THE TEMPLE OF TSATH": "EL TEMPLO DE TSATH",
+  },
+  ulthar_kadath: {
+    "THE TEMPLE OF THE ELDER ONES": "EL TEMPLO DE LOS ANTIGUOS",
+    "THE BLACK GALLEYS": "LAS GALERAS NEGRAS",
+    "DYLATH-LEEN": "DYLATH-LEEN",
+    "THE CITY OF THE GUGS": "LA CIUDAD DE LOS GUGS",
+    "THE TOWER OF KOTH": "LA TORRE DE KOTH",
+  },
+  risen_rlyeh: {
+    "THE SUNKEN COURT": "LA CORTE HUNDIDA",
+    "THE ANGLES ARE WRONG": "LOS ÁNGULOS ESTÁN EQUIVOCADOS",
+    "THE TOMB OF MU": "LA TUMBA DE MU",
+  },
+  migo_cities: {
+    "THE SURGERY OF THE OUTER ONES": "LA CIRUGÍA DE LOS DE FUERA",
+    "THE BLACK TOWERS": "LAS TORRES NEGRAS",
+    "THE CYLINDERS": "LOS CILINDROS",
+  },
+  ultimate_void: {
+    "THE NADIR": "EL NADIR",
+  },
+  slumber: {
+    "THE SEVENTY STEPS OF LIGHT SLUMBER": "LOS SETENTA ESCALONES DEL SUEÑO LIGERO",
+    "THE CAVERN OF FLAME": "LA CAVERNA DE LA LLAMA",
+    "THE SEVEN HUNDRED STEPS OF DEEPER SLUMBER": "LOS SETECIENTOS ESCALONES DEL SUEÑO PROFUNDO",
+    "THE GATE OF DEEPER SLUMBER": "LA PUERTA DEL SUEÑO PROFUNDO",
+  },
+};

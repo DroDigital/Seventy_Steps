@@ -4,6 +4,7 @@
  * Round 52: each relic's effects are figures, green for a gift and red for a price, in place of a paragraph of rules and a line of words.
  */
 
+import { story } from '../core/i18n';
 import { RELICS, type RelicId } from '../data/relics';
 import type { Game } from '../systems/components';
 import { clearNew } from '../systems/finds';
@@ -24,14 +25,14 @@ export function relicsTab(panel: HTMLElement, g: Game, pick: (slot: number) => v
   clearNew(g, 'relic'); // looked at, here at the Elder Sign where they are changed (round 60)
   heading(panel, `WORN  ·  ${slots.filter(Boolean).length} OF ${slots.length}`).style.marginTop = '0';
   slots.forEach((id, slot) => {
-    const b = button(panel, `Slot ${NUMERALS[slot]}  ·  ${id ? RELICS[id].name : 'empty'}  ›`, () => pick(slot), true, id ? RELICS[id].note : 'Nothing worn here.');
+    const b = button(panel, `Slot ${NUMERALS[slot]}  ·  ${id ? story(RELICS[id].name) : 'empty'}  ›`, () => pick(slot), true, id ? story(RELICS[id].note) : 'Nothing worn here.');
     if (id) {
       effectChips(b, id);
       b.prepend(relicGlyph(id));
     }
   });
   const kept = found.filter((id) => !slots.includes(id));
-  if (kept.length) el(panel, 'div', `Kept: ${kept.map((id) => RELICS[id].name).join(', ')}`, 'opacity:.5;font-size:12px;line-height:1.5;padding:8px 14px 0');
+  if (kept.length) el(panel, 'div', `Kept: ${kept.map((id) => story(RELICS[id].name)).join(', ')}`, 'opacity:.5;font-size:12px;line-height:1.5;padding:8px 14px 0');
   if (!found.length) el(panel, 'div', 'A horror slain for good leaves one.', 'opacity:.5;font-style:italic;padding:8px 14px 0;font-size:13px');
 }
 
@@ -47,7 +48,7 @@ export function slotPage(g: Game, slot: number, back: () => void): Page {
       for (const id of owned(g)) {
         const at = slots.indexOf(id);
         const here = at === slot ? '    ·  worn here' : at >= 0 ? `    ·  worn in slot ${NUMERALS[at]}` : '';
-        const b = button(p, `${RELICS[id].name}${here}`, () => choose(id), true, RELICS[id].note);
+        const b = button(p, `${story(RELICS[id].name)}${here}`, () => choose(id), true, story(RELICS[id].note));
         effectChips(b, id);
         b.prepend(relicGlyph(id));
       }

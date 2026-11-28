@@ -4,6 +4,7 @@
  * (menuKit.ts); the investigator takes no input while it is open, as at an Elder Sign.
  */
 
+import { story } from '../core/i18n';
 import { SHOPS, WARES } from '../data/wares';
 import type { Game } from '../systems/components';
 import { buy, canBuy, carried, hasRoom, stockLeft } from '../systems/trade';
@@ -31,7 +32,7 @@ export function createShopMenu(g: Game): ShopMenu {
           const room = hasRoom(g, id);
           const why = left === 0 ? 'Sold out.' : !room ? 'No room to carry it.' : 'Not enough Echoes.';
           const c = carried(g, id); // what a pocket holds, before it is asked (round 24)
-          const b = option(panel, left === undefined || left === 0 ? w.name : `${w.name}  ·  ${left} left`, () => (buy(g, id), page.redraw?.()), ok, why, fill(w.note)); // round 38: still a line to choose, so that what it is can be read, and why it cannot be bought
+          const b = option(panel, left === undefined || left === 0 ? story(w.name) : `${story(w.name)}  ·  ${left} left`, () => (buy(g, id), page.redraw?.()), ok, why, fill(story(w.note))); // round 38: still a line to choose, so that what it is can be read, and why it cannot be bought
           if (c) chips(b, [{ text: `Carried ${c.have} of ${c.most} ${c.unit}`, tone: 'dim' }]);
           if (left === 0) price(b, 'SOLD OUT', 'max');
           else if (!room) price(b, 'NO ROOM', 'no'); // (a full pocket said nothing, round 24)

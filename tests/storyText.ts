@@ -5,6 +5,7 @@
  * never its [tags]).
  */
 
+import { ACHIEVEMENTS } from '../src/data/achievements';
 import { FIELD_NOTES } from '../src/data/bestiaryNotes';
 import { OWN_SPECS, OWNER } from '../src/data/bossMoves';
 import { EPITHETS } from '../src/data/bossCards';
@@ -16,6 +17,7 @@ import { ENDINGS } from '../src/data/endings';
 import { bossLine } from '../src/data/speechLines';
 import { EDGES, FRAGMENTS, GENERIC, SEAS, TIPS as BLOW_TIPS } from '../src/data/deathLines';
 import { PETRIFIED } from '../src/systems/deathNotes';
+import { CREDITS } from '../src/data/credits';
 import { DOCUMENTS } from '../src/data/documents';
 import { EPITAPHS } from '../src/data/epitaphs';
 import { INTRO, introText } from '../src/data/intro';
@@ -25,9 +27,12 @@ import { FATES } from '../src/data/epilogues';
 import { OVERHEARD } from '../src/data/overheard';
 import { POIS } from '../src/data/pois';
 import { QUESTS } from '../src/data/quests';
+import { RELICS } from '../src/data/relics';
 import { REGIONS } from '../src/data/regions';
 import { ENTITIES } from '../src/data/registry';
 import { RUMORS } from '../src/data/rumors';
+import { WARES } from '../src/data/wares';
+import { WEAPON_WHERE, WEAPONS } from '../src/data/weapons';
 import { placesOf } from '../src/world/namedPlaces';
 import { worldLayout } from '../src/world/placements';
 import type { StoryDomain } from '../src/data/lang/story';
@@ -104,6 +109,24 @@ export const STORY_SOURCES: Readonly<Record<StoryDomain, () => StorySource>> = {
     for (const [id, e] of Object.entries(ENDINGS)) by.set(id, [...new Set([...words(ENDING_SCENES[id]), ...lines(e.choice, e.title, ...e.lines)])]);
     return new Map([...by].filter(([, l]) => l.length));
   },
+  // the arms: each weapon's name, how it handles and where it is had, and each relic's name and its gift and price
+  arms: () =>
+    new Map<string, string[]>([
+      ...Object.entries(WEAPONS).map(([id, w]) => [id, lines(w.name, w.note, (WEAPON_WHERE as Record<string, string>)[id])] as [string, string[]]),
+      ...Object.entries(RELICS).map(([id, r]) => [id, lines(r.name, r.note)] as [string, string[]]),
+    ]),
+  // what the merchants sell: a name and what it is for ({buttons} kept as they are)
+  wares: () => new Map(Object.entries(WARES).map(([id, w]) => [id, lines(w.name, w.note)])),
+  // the achievements: a name and what earns it
+  achievements: () => new Map(Object.entries(ACHIEVEMENTS).map(([id, a]) => [id, lines(a.name, a.note)])),
+  // the words a dungeon's rooms say as they are entered, by dungeon
+  rooms: () => {
+    const by = new Map<string, string[]>();
+    for (const { layout: d } of worldLayout().dungeons) for (const r of d.rooms) if (r.def.words) (by.get(d.def.id) ?? by.set(d.def.id, []).get(d.def.id)!).push(r.def.words);
+    return new Map([...by].map(([id, l]) => [id, [...new Set(l)]]));
+  },
+  // the credits: their headings and lines (a name is the same in every language)
+  credits: () => new Map([['credits', [...new Set(CREDITS.flatMap((c) => lines(c.heading, ...c.lines)))]]]),
   // the lines under the veil: Lovecraft's (the one that names Cthulhu apart, which the demo leaves out), the lessons by their hint, the descent's
   lore: () => {
     const by = new Map<string, string[]>([['quotes', QUOTES.filter((q) => !q.includes('Cthulhu'))], ['cthulhu', QUOTES.filter((q) => q.includes('Cthulhu'))], ['descent', [DESCENT_LINE]]]);

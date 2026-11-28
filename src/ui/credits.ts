@@ -3,7 +3,7 @@
  * themselves, from the title, the pause menu, and after an ending.
  */
 
-import { t } from '../core/i18n';
+import { story, t } from '../core/i18n';
 import { CREDITS } from '../data/credits';
 import { GAME_NAME } from '../data/intro';
 import { glyph } from './glyphs';
@@ -20,8 +20,8 @@ export function creditsPage(back: () => void, label = t('keys.back')): Page {
       const names = el(roll, 'div', '', 'padding:300px 0 40px');
       for (const b of CREDITS) {
         const dim = b.quiet ? 'opacity:.55;font-size:10px;' : '';
-        if (b.heading) el(names, 'div', b.heading, `opacity:${b.quiet ? '.5' : '.55'};font-size:${b.quiet ? '9' : '11'}px;letter-spacing:4px;margin-top:${b.quiet ? '34' : '26'}px`);
-        b.lines.forEach((line, i) => el(names, 'div', line, b.title && i === 0 ? 'font-size:22px;letter-spacing:6px;margin:10px 12px 22px;line-height:1.5' : `${dim}margin:${b.quiet ? '3' : '5'}px 12px;line-height:1.5`));
+        if (b.heading) el(names, 'div', story(b.heading), `opacity:${b.quiet ? '.5' : '.55'};font-size:${b.quiet ? '9' : '11'}px;letter-spacing:4px;margin-top:${b.quiet ? '34' : '26'}px`);
+        b.lines.forEach((line, i) => el(names, 'div', story(line), b.title && i === 0 ? 'font-size:22px;letter-spacing:6px;margin:10px 12px 22px;line-height:1.5' : `${dim}margin:${b.quiet ? '3' : '5'}px 12px;line-height:1.5`));
       }
       const start = performance.now();
       const tick = (): void => {

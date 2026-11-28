@@ -8,6 +8,7 @@
  * heading; the relics, found and not, are here too, with which are worn.
  */
 
+import { story } from '../core/i18n';
 import { PLAYER_MOVES } from '../data/moves';
 import { GUN, SIM } from '../data/tuning';
 import { WEAPON_IDS, WEAPON_WHERE, WEAPONS, type WeaponDef } from '../data/weapons';
@@ -42,7 +43,7 @@ export function armsPage(g: Game, back: () => void, show: (p: Page) => void): Pa
       const list = el(p, 'div');
       for (const id of WEAPON_IDS) {
         if (!g.player.arms.includes(id)) { // not yet found: a sealed line, and the rumour when it is chosen
-          const sealed = button(list, 'Not yet found', () => undefined, true, '', id === 'cane' ? '' : WEAPON_WHERE[id]); // (the rumour is told on the line itself)
+          const sealed = button(list, 'Not yet found', () => undefined, true, '', id === 'cane' ? '' : story(WEAPON_WHERE[id])); // (the rumour is told on the line itself)
           sealed.prepend(unfoundGlyph());
           sealed.style.opacity = '.6';
           continue;
@@ -66,7 +67,7 @@ export function armsPage(g: Game, back: () => void, show: (p: Page) => void): Pa
       heading(p, `RELICS  ·  ${found.length} OF ${RELIC_IDS.length} FOUND  ·  ${slots.filter(Boolean).length} OF ${RELIC_SLOTS} WORN`).style.margin = '14px 14px 4px';
       for (const id of found) {
         const at = slots.indexOf(id);
-        const b = button(p, `${RELICS[id].name}${at >= 0 ? '    ·  worn' : '    ·  kept'}`, () => undefined, true, `${RELICS[id].note}\n${at >= 0 ? 'Worn.' : 'Not worn: it does nothing until it is put on.'} Changed at an Elder Sign.`);
+        const b = button(p, `${story(RELICS[id].name)}${at >= 0 ? '    ·  worn' : '    ·  kept'}`, () => undefined, true, `${story(RELICS[id].note)}\n${at >= 0 ? 'Worn.' : 'Not worn: it does nothing until it is put on.'} Changed at an Elder Sign.`);
         b.prepend(relicGlyph(id));
         if (isNew(g, 'relic', id)) price(b, 'NEW');
         effectChips(b, id);
